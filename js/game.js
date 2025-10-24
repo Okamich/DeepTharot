@@ -79,9 +79,22 @@ class Game {
         console.log(`Лог: ${message}`);
     }
 
+    addVisualEffect(character, effectType) {
+        const avatar = character === 'player' ? 
+            document.getElementById('playerAvatar') : 
+            document.querySelector(`.enemy-avatar[data-index="${character}"]`);
+        
+        if (avatar) {
+            avatar.classList.add(effectType);
+            setTimeout(() => {
+                avatar.classList.remove(effectType);
+            }, 500);
+        }
+    }
+
     updateUI() {
         this.updatePlayerInfo();
-        this.updateProgressInfo(); // Изменили на updateProgressInfo
+        this.updateProgressInfo();
         this.updateInitiativeBar();
     }
 
@@ -206,7 +219,7 @@ class Game {
     togglePause() {
         this.paused = !this.paused;
         document.getElementById('pauseBtn').textContent = 
-            this.paused ? 'Продолжить' : 'Пауза';
+            this.paused ? '▶️ Продолжить' : '⏸️ Пауза';
     }
 
     // ========== СИСТЕМА ИССЛЕДОВАНИЯ ==========
@@ -251,8 +264,8 @@ class Game {
         document.getElementById('explorationView').style.display = 'block';
         document.getElementById('battleView').style.display = 'none';
         document.getElementById('autoBattleIndicator').style.display = 'none';
-        document.getElementById('modeIndicator').textContent = 'ИССЛЕДОВАНИЕ';
-        document.getElementById('modeIndicator').style.background = '#2196f3';
+        document.getElementById('modeIndicator').textContent = '🔍 ИССЛЕДОВАНИЕ';
+        document.getElementById('modeIndicator').style.background = 'linear-gradient(145deg, #2196f3, #1976d2)';
         console.log("Режим исследования активирован");
     }
 
@@ -289,7 +302,7 @@ class Game {
         this.currentTurn = null;
         
         this.showBattleView();
-        this.updateZoneInfo(); // Теперь используем updateZoneInfo только для боя
+        this.updateZoneInfo();
         this.renderEnemies();
         this.addLogEntry(`Начало боя в зоне: ${zoneInfo.name}`, 'info');
         this.addLogEntry(`Появилось врагов: ${enemyCount}`, 'info');
@@ -371,50 +384,68 @@ class Game {
         // Атакуем случайного живого врага
         const targetIndex = Math.floor(Math.random() * aliveEnemies.length);
         const target = aliveEnemies[targetIndex];
-        const damage = this.player.attack(target);
         
-        this.addLogEntry(`Вы атаковали ${target.name} и нанесли ${damage} урона!`, 'damage');
-        this.updateBattleStatus(`Атака по ${target.name}!`);
-        this.renderEnemies();
+        // Анимация атаки игрока
+        this.addVisualEffect('player', 'attacking');
         
-        // Проверяем смерть врага
-        if (target.health <= 0) {
-            this.addLogEntry(`${target.name} повержен!`, 'info');
-            const expGained = this.player.gainExp(target.expReward);
-            this.player.gold += target.goldReward;
+        setTimeout(() => {
+            const damage = this.player.attack(target);
             
-            if (expGained > 0) {
-                this.addLogEntry(`Получено ${expGained} опыта! Уровень повышен!`, 'levelup');
-            } else {
-                this.addLogEntry(`Получено ${target.expReward} опыта!`, 'exp');
+            // Анимация получения урона врагом
+            this.addVisualEffect(targetIndex, 'taking-damage');
+            
+            this.addLogEntry(`Вы атаковали ${target.name} и нанесли ${damage} урона!`, 'damage');
+            this.updateBattleStatus(`Атака по ${target.name}!`);
+            this.renderEnemies();
+            
+            // Проверяем смерть врага
+            if (target.health <= 0) {
+                this.addLogEntry(`${target.name} повержен!`, 'info');
+                const expGained = this.player.gainExp(target.expReward);
+                this.player.gold += target.goldReward;
+                
+                if (expGained > 0) {
+                    this.addLogEntry(`Получено ${expGained} опыта! Уровень повышен!`, 'levelup');
+                } else {
+                    this.addLogEntry(`Получено ${target.expReward} опыта!`, 'exp');
+                }
+                
+                this.addLogEntry(`Получено ${target.goldReward} золота!`, 'info');
+                
+                // Проверяем окончание боя
+                if (this.enemies.every(e => e.health <= 0)) {
+                    this.battleCompleted();
+                    return;
+                }
             }
-            
-            this.addLogEntry(`Получено ${target.goldReward} золота!`, 'info');
-            
-            // Проверяем окончание боя
-            if (this.enemies.every(e => e.health <= 0)) {
-                this.battleCompleted();
-                return;
-            }
-        }
+        }, 300);
     }
 
     enemyAttack(enemyIndex) {
         const enemy = this.enemies[enemyIndex];
         if (enemy.health <= 0) return;
         
-        const damage = enemy.attack(this.player);
-        this.addLogEntry(`${enemy.name} атаковал вас и нанес ${damage} урона!`, 'damage');
-        this.updateBattleStatus(`${enemy.name} атакует!`);
-        this.updatePlayerInfo();
+        // Анимация атаки врага
+        this.addVisualEffect(enemyIndex, 'attacking');
         
-        // Проверяем смерть игрока
-        if (this.player.health <= 0) {
-            this.addLogEntry('Вы погибли! Воскрешение...', 'damage');
-            this.player.respawn();
+        setTimeout(() => {
+            const damage = enemy.attack(this.player);
+            
+            // Анимация получения урона игроком
+            this.addVisualEffect('player', 'taking-damage');
+            
+            this.addLogEntry(`${enemy.name} атаковал вас и нанес ${damage} урона!`, 'damage');
+            this.updateBattleStatus(`${enemy.name} атакует!`);
             this.updatePlayerInfo();
-            this.updateBattleStatus('Воскрешение...');
-        }
+            
+            // Проверяем смерть игрока
+            if (this.player.health <= 0) {
+                this.addLogEntry('Вы погибли! Воскрешение...', 'damage');
+                this.player.respawn();
+                this.updatePlayerInfo();
+                this.updateBattleStatus('Воскрешение...');
+            }
+        }, 300);
     }
 
     battleCompleted() {
@@ -444,8 +475,8 @@ class Game {
         document.getElementById('explorationView').style.display = 'none';
         document.getElementById('battleView').style.display = 'block';
         document.getElementById('autoBattleIndicator').style.display = 'block';
-        document.getElementById('modeIndicator').textContent = 'БОЙ';
-        document.getElementById('modeIndicator').style.background = '#f44336';
+        document.getElementById('modeIndicator').textContent = '⚔️ БОЙ';
+        document.getElementById('modeIndicator').style.background = 'linear-gradient(145deg, #f44336, #d32f2f)';
         
         // Обновляем информацию о зоне при переходе в режим боя
         this.updateZoneInfo();
@@ -464,10 +495,10 @@ class Game {
             enemyElement.className = 'character enemy';
             
             enemyElement.innerHTML = `
-                <div class="character-avatar enemy-avatar" data-index="${index}">E</div>
+                <div class="character-avatar enemy-avatar" data-index="${index}">👹</div>
                 <div class="character-name">${enemy.name}</div>
                 <div class="character-stats">
-                    HP: ${enemy.health}/${enemy.maxHealth}
+                    ❤️ HP: ${enemy.health}/${enemy.maxHealth}
                 </div>
             `;
             
@@ -500,12 +531,12 @@ class Game {
             }
             
             itemElement.innerHTML = `
-                <div class="item-value">${item.value}G</div>
+                <div class="item-value">${item.value}💰</div>
                 <div class="item-name">${item.name}</div>
                 <div class="item-stats">
-                    ${item.damageBonus ? `Урон: +${item.damageBonus}<br>` : ''}
-                    ${item.defenseBonus ? `Защ: +${item.defenseBonus}<br>` : ''}
-                    ${item.healthBonus ? `Здоровье: +${item.healthBonus}` : ''}
+                    ${item.damageBonus ? `⚔️ +${item.damageBonus}<br>` : ''}
+                    ${item.defenseBonus ? `🛡️ +${item.defenseBonus}<br>` : ''}
+                    ${item.healthBonus ? `❤️ +${item.healthBonus}` : ''}
                 </div>
             `;
             
