@@ -1,57 +1,186 @@
-<!-- В боковой панели заменим статические строки на версию с иконками -->
-<div class="panel-section">
-    <h3>Игрок</h3>
-    <div class="stat-row">
-        <span>🎯 Уровень:</span>
-        <span id="playerLevel" class="stat-value">1</span>
-    </div>
-    <div class="stat-row">
-        <span>⭐ Опыт:</span>
-        <span id="playerExp" class="stat-value">0/100</span>
-    </div>
-    <div class="progress-bar">
-        <div id="expBar" class="progress-fill" style="width: 0%"></div>
-    </div>
-    <div class="stat-row">
-        <span>❤️ Здоровье:</span>
-        <span id="playerHealth" class="stat-value">100/100</span>
-    </div>
-    <div class="progress-bar health-bar">
-        <div id="healthBar" class="progress-fill health-fill" style="width: 100%"></div>
-    </div>
-    <div class="stat-row">
-        <span>⚔️ Урон:</span>
-        <span id="playerDamage" class="stat-value">10</span>
-    </div>
-    <div class="stat-row">
-        <span>🛡️ Защита:</span>
-        <span id="playerDefense" class="stat-value">5</span>
-    </div>
-    <div class="stat-row">
-        <span>⚡ Скорость:</span>
-        <span id="playerSpeed" class="stat-value">10</span>
-    </div>
-    <div class="stat-row">
-        <span>💰 Золото:</span>
-        <span id="playerGold" class="stat-value">0</span>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle RPG - Исследования и бои</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Боковая панель -->
+        <div class="side-panel">
+            <div class="panel-section">
+                <h3>Игрок</h3>
+                <div class="stat-row">
+                    <span>🎯 Уровень:</span>
+                    <span id="playerLevel" class="stat-value">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>⭐ Опыт:</span>
+                    <span id="playerExp" class="stat-value">0/100</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="expBar" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="stat-row">
+                    <span>❤️ Здоровье:</span>
+                    <span id="playerHealth" class="stat-value">100/100</span>
+                </div>
+                <div class="progress-bar health-bar">
+                    <div id="healthBar" class="progress-fill health-fill" style="width: 100%"></div>
+                </div>
+                <div class="stat-row">
+                    <span>⚔️ Урон:</span>
+                    <span id="playerDamage" class="stat-value">10</span>
+                </div>
+                <div class="stat-row">
+                    <span>🛡️ Защита:</span>
+                    <span id="playerDefense" class="stat-value">5</span>
+                </div>
+                <div class="stat-row">
+                    <span>⚡ Скорость:</span>
+                    <span id="playerSpeed" class="stat-value">10</span>
+                </div>
+                <div class="stat-row">
+                    <span>💰 Золото:</span>
+                    <span id="playerGold" class="stat-value">0</span>
+                </div>
+            </div>
 
-<!-- В экипировке тоже добавим иконки -->
-<div class="panel-section">
-    <h3>Экипировка</h3>
-    <div class="equipment-slots">
-        <div class="slot" data-slot="weapon">
-            <span>⚔️ Оружие</span>
-            <div id="weaponSlot" class="slot-content">Пусто</div>
+            <div class="panel-section">
+                <h3>Экипировка</h3>
+                <div class="equipment-slots">
+                    <div class="slot" data-slot="weapon">
+                        <span>⚔️ Оружие</span>
+                        <div id="weaponSlot" class="slot-content">Пусто</div>
+                    </div>
+                    <div class="slot" data-slot="armor">
+                        <span>🛡️ Броня</span>
+                        <div id="armorSlot" class="slot-content">Пусто</div>
+                    </div>
+                    <div class="slot" data-slot="accessory">
+                        <span>💍 Аксессуар</span>
+                        <div id="accessorySlot" class="slot-content">Пусто</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Прогресс</h3>
+                <div class="stat-row">
+                    <span>🎯 Уровень:</span>
+                    <span id="currentLevel">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>🗺️ Зона:</span>
+                    <span id="currentZone">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>🔍 Исследование:</span>
+                    <span id="explorationProgress">0%</span>
+                </div>
+                <div class="progress-bar exploration-bar">
+                    <div id="explorationBar" class="progress-fill exploration-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Управление</h3>
+                <button id="inventoryBtn">📦 Инвентарь (I)</button>
+                <button id="pauseBtn">⏸️ Пауза</button>
+            </div>
         </div>
-        <div class="slot" data-slot="armor">
-            <span>🛡️ Броня</span>
-            <div id="armorSlot" class="slot-content">Пусто</div>
-        </div>
-        <div class="slot" data-slot="accessory">
-            <span>💍 Аксессуар</span>
-            <div id="accessorySlot" class="slot-content">Пусто</div>
+
+        <!-- Основная игровая область -->
+        <div class="game-area">
+            <div class="auto-battle-indicator" id="autoBattleIndicator" style="display: none;">⚔️ АВТОБОЙ</div>
+            <div class="mode-indicator" id="modeIndicator">🔍 ИССЛЕДОВАНИЕ</div>
+            
+            <div class="activity-log" id="activityLog">
+                <div class="log-entry log-info">Добро пожаловать в Idle RPG! Вы начинаете исследовать мир...</div>
+            </div>
+
+            <div class="main-content">
+                <!-- Режим исследования -->
+                <div class="exploration-view" id="explorationView">
+                    <div class="location-image" id="locationImage">🌲</div>
+                    <div class="location-title" id="locationTitle">Лесная тропа</div>
+                    <div class="location-description" id="locationDescription">
+                        Вы идете по заросшей лесной тропинке. Вокруг шелестят листья, 
+                        и доносится пение птиц. Что ждет вас впереди?
+                    </div>
+                    
+                    <div class="exploration-progress">
+                        <div class="progress-bar exploration-bar">
+                            <div id="explorationProgressBar" class="progress-fill exploration-fill" style="width: 0%"></div>
+                        </div>
+                        <div style="text-align: center; margin-top: 5px; font-size: 12px; color: #bbb;">
+                            Прогресс исследования
+                        </div>
+                    </div>
+                    
+                    <div class="event-result" id="eventResult" style="display: none;">
+                        <div class="event-title" id="eventTitle">Найден сундук!</div>
+                        <div class="event-description" id="eventDescription">
+                            Вы обнаружили старый сундук, спрятанный под корнями дерева.
+                        </div>
+                        <div class="event-rewards" id="eventRewards">
+                            <!-- Награды будут добавляться здесь -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Режим боя -->
+                <div class="battle-view" id="battleView">
+                    <div class="zone-info">
+                        <div class="zone-title" id="zoneTitle">Уровень 1 - Зона 1</div>
+                        <div class="zone-description" id="zoneDescription">Слабая нежить (1-2 противника)</div>
+                    </div>
+
+                    <div class="initiative-bar" id="initiativeBar">
+                        <div class="initiative-fill" id="initiativeFill" style="width: 0%"></div>
+                    </div>
+
+                    <div class="battle-status" id="battleStatus">Подготовка к бою...</div>
+
+                    <div class="combatants">
+                        <div class="character">
+                            <div class="character-avatar" id="playerAvatar">⚔️</div>
+                            <div class="character-name" id="playerName">Игрок</div>
+                            <div class="character-stats">
+                                ❤️ HP: <span id="playerCurrentHealth">100</span>/<span id="playerMaxHealth">100</span>
+                            </div>
+                        </div>
+
+                        <div class="enemies-container" id="enemiesContainer">
+                            <!-- Враги будут добавляться здесь -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- Модальное окно инвентаря -->
+    <div id="inventoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🎒 Инвентарь</h2>
+            <div class="inventory-grid" id="inventoryGrid">
+                <!-- Предметы будут добавляться здесь -->
+            </div>
+            <div class="inventory-help">
+                <p>🖱️ ЛКМ - экипировать/снять предмет</p>
+                <p>🖱️ ПКМ - продать предмет</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/item.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
