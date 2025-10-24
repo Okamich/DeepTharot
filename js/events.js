@@ -71,7 +71,12 @@ class EventSystem {
             [{ type: "gold", amount: goldAmount }]
         );
         
-        this.game.addLogEntry(`Вы нашли ${goldAmount} золотых монет!`, "gold");
+        // Проверяем что метод addLogEntry существует
+        if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
+            this.game.addLogEntry(`Вы нашли ${goldAmount} золотых монет!`, "gold");
+        } else {
+            console.error("Метод addLogEntry не найден!");
+        }
     }
 
     findItemEvent() {
@@ -87,7 +92,9 @@ class EventSystem {
             [{ type: "item", item: item }]
         );
         
-        this.game.addLogEntry(`Получено: ${item.name}`, "info");
+        if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
+            this.game.addLogEntry(`Получено: ${item.name}`, "info");
+        }
     }
 
     healingEvent() {
@@ -103,7 +110,9 @@ class EventSystem {
             [{ type: "heal", amount: actualHeal }]
         );
         
-        this.game.addLogEntry(`Вы восстановили ${actualHeal} здоровья!`, "heal");
+        if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
+            this.game.addLogEntry(`Вы восстановили ${actualHeal} здоровья!`, "heal");
+        }
     }
 
     experienceEvent() {
@@ -117,10 +126,12 @@ class EventSystem {
             [{ type: "exp", amount: expAmount }]
         );
         
-        if (levelsGained > 0) {
-            this.game.addLogEntry(`Получено ${expAmount} опыта! Уровень повышен!`, "levelup");
-        } else {
-            this.game.addLogEntry(`Получено ${expAmount} опыта!`, "exp");
+        if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
+            if (levelsGained > 0) {
+                this.game.addLogEntry(`Получено ${expAmount} опыта! Уровень повышен!`, "levelup");
+            } else {
+                this.game.addLogEntry(`Получено ${expAmount} опыта!`, "exp");
+            }
         }
     }
 
@@ -171,12 +182,16 @@ class EventSystem {
             discovery.rewards
         );
         
-        this.game.addLogEntry(`Открытие: ${discovery.title}`, "event");
+        if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
+            this.game.addLogEntry(`Открытие: ${discovery.title}`, "event");
+        }
     }
 
     startBattleEvent() {
         console.log("Событие: начало боя");
-        this.game.addLogEntry("Внезапно вас атакуют враги!", "damage");
+        if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
+            this.game.addLogEntry("Внезапно вас атакуют враги!", "damage");
+        }
         this.game.startBattle();
     }
 
