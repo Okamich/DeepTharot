@@ -186,11 +186,22 @@ class EventSystem {
 
     startBattleEvent() {
         console.log("Событие: начало боя");
+        
+        // Показываем сообщение о начале боя
+        this.showEventResult(
+            "Встреча с врагами!",
+            "Внезапно вас атакуют враги! Приготовьтесь к бою!",
+            [{ type: "info", amount: "Бой" }]
+        );
+        
         if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
             this.game.addLogEntry("Внезапно вас атакуют враги!", "damage");
         }
-        this.game.startBattle();
-        // UI обновится автоматически при переходе в режим боя
+        
+        // Запускаем бой после небольшой задержки, чтобы показать сообщение
+        setTimeout(() => {
+            this.game.startBattle();
+        }, 2000);
     }
 
     showEventResult(title, description, rewards) {
@@ -229,6 +240,10 @@ class EventSystem {
                     icon = '🎁';
                     text = reward.item.name;
                     break;
+                case 'info':
+                    icon = '⚔️';
+                    text = reward.amount;
+                    break;
             }
             
             rewardElement.innerHTML = `
@@ -244,10 +259,13 @@ class EventSystem {
         // ОБНОВЛЯЕМ UI ПЕРЕД ПОКАЗОМ РЕЗУЛЬТАТА
         this.game.updatePlayerInfo();
         
-        // Скрываем результат события через 3 секунды
-        setTimeout(() => {
-            eventResult.style.display = 'none';
-            this.changeLocation();
-        }, 3000);
+        // Для событий, которые не являются битвой, скрываем результат через 3 секунды
+        if (title !== "Встреча с врагами!") {
+            setTimeout(() => {
+                eventResult.style.display = 'none';
+                this.changeLocation();
+            }, 3000);
+        }
+        // Для события битвы результат скроется автоматически при переходе в режим боя
     }
 }
