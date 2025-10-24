@@ -1,8 +1,5 @@
 class Player {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.radius = 20;
+    constructor() {
         this.level = 1;
         this.exp = 0;
         this.expToNextLevel = 100;
@@ -11,9 +8,7 @@ class Player {
         this.health = this.maxHealth;
         this.damage = 10;
         this.defense = 5;
-        this.speed = 3;
-        this.attackSpeed = 1.0;
-        this.attackCooldown = 0;
+        this.speed = 12;
         
         this.equipment = {
             weapon: null,
@@ -22,35 +17,18 @@ class Player {
         };
         
         this.inventory = [];
-        this.color = '#2196f3';
     }
 
-    moveTowards(targetX, targetY) {
-        const dx = targetX - this.x;
-        const dy = targetY - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+    attack(target) {
+        let totalDamage = this.damage;
+        if (this.equipment.weapon) {
+            totalDamage += this.equipment.weapon.damageBonus;
+        }
+        if (this.equipment.accessory) {
+            totalDamage += this.equipment.accessory.damageBonus;
+        }
         
-        if (distance > 0) {
-            this.x += (dx / distance) * this.speed;
-            this.y += (dy / distance) * this.speed;
-        }
-    }
-
-    attack(enemy) {
-        if (this.attackCooldown <= 0) {
-            let totalDamage = this.damage;
-            if (this.equipment.weapon) {
-                totalDamage += this.equipment.weapon.damageBonus;
-            }
-            if (this.equipment.accessory) {
-                totalDamage += this.equipment.accessory.damageBonus;
-            }
-            
-            enemy.takeDamage(totalDamage);
-            this.attackCooldown = 1000 / this.attackSpeed;
-            return true;
-        }
-        return false;
+        return target.takeDamage(totalDamage);
     }
 
     takeDamage(damage) {
@@ -69,21 +47,26 @@ class Player {
 
     gainExp(amount) {
         this.exp += amount;
-        if (this.exp >= this.expToNextLevel) {
+        let levelsGained = 0;
+        
+        while (this.exp >= this.expToNextLevel) {
+            this.exp -= this.expToNextLevel;
             this.levelUp();
+            levelsGained++;
         }
+        
+        return levelsGained > 0 ? amount : 0;
     }
 
     levelUp() {
         this.level++;
-        this.exp -= this.expToNextLevel;
         this.expToNextLevel = Math.floor(this.expToNextLevel * 1.5);
         
         this.maxHealth += 20;
         this.health = this.maxHealth;
         this.damage += 5;
         this.defense += 2;
-        this.speed += 0.2;
+        this.speed += 1;
     }
 
     addItem(item) {
@@ -105,7 +88,6 @@ class Player {
         
         this.equipment[item.type] = item;
         
-        // Применяем бонусы
         if (item.damageBonus) this.damage += item.damageBonus;
         if (item.defenseBonus) this.defense += item.defenseBonus;
         if (item.healthBonus) {
@@ -118,7 +100,6 @@ class Player {
         const item = this.equipment[itemType];
         if (!item) return;
         
-        // Убираем бонусы
         if (item.damageBonus) this.damage -= item.damageBonus;
         if (item.defenseBonus) this.defense -= item.defenseBonus;
         if (item.healthBonus) {
@@ -138,37 +119,8 @@ class Player {
         this.inventory = this.inventory.filter(i => i !== item);
     }
 
-    update(deltaTime) {
-        if (this.attackCooldown > 0) {
-            this.attackCooldown -= deltaTime;
-        }
-    }
-
-    render(ctx) {
-        // Рисуем игрока
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Рисуем полоску здоровья
-        this.renderHealthBar(ctx);
-    }
-
-    renderHealthBar(ctx) {
-        const barWidth = 40;
-        const barHeight = 5;
-        const healthPercent = this.health / this.maxHealth;
-        
-        ctx.fillStyle = '#443333';
-        ctx.fillRect(this.x - barWidth / 2, this.y - this.radius - 10, barWidth, barHeight);
-        
-        ctx.fillStyle = '#4caf50';
-        ctx.fillRect(this.x - barWidth / 2, this.y - this.radius - 10, barWidth * healthPercent, barHeight);
-    }
-
     respawn() {
         this.health = this.maxHealth;
-        this.gold = Math.max(0, this.gold - 10); // Штраф за смерть
+        this.gold = Math.max(0, this.gold - 10);
     }
 }
