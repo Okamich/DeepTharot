@@ -29,6 +29,8 @@ class EventSystem {
                 icon: "🌳"
             }
         ];
+        
+        console.log("EventSystem инициализирован");
     }
 
     changeLocation() {
@@ -36,9 +38,13 @@ class EventSystem {
         document.getElementById('locationImage').textContent = location.icon;
         document.getElementById('locationTitle').textContent = location.name;
         document.getElementById('locationDescription').textContent = location.description;
+        
+        console.log("Локация изменена на:", location.name);
     }
 
     triggerRandomEvent() {
+        console.log("Запуск случайного события...");
+        
         const events = [
             this.findGoldEvent.bind(this),
             this.findItemEvent.bind(this),
@@ -50,10 +56,12 @@ class EventSystem {
         
         // Выбираем случайное событие
         const randomEvent = events[Math.floor(Math.random() * events.length)];
+        console.log("Выбрано событие:", randomEvent.name);
         randomEvent();
     }
 
     findGoldEvent() {
+        console.log("Событие: находка золота");
         const goldAmount = 10 + Math.floor(Math.random() * 20) + this.game.currentLevel * 5;
         this.game.player.gold += goldAmount;
         
@@ -67,6 +75,7 @@ class EventSystem {
     }
 
     findItemEvent() {
+        console.log("Событие: находка предмета");
         const itemTypes = ['weapon', 'armor', 'accessory'];
         const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
         const item = new Item(itemType, this.game.currentLevel);
@@ -82,6 +91,7 @@ class EventSystem {
     }
 
     healingEvent() {
+        console.log("Событие: исцеление");
         const healAmount = 10 + Math.floor(Math.random() * 20);
         const oldHealth = this.game.player.health;
         this.game.player.health = Math.min(this.game.player.health + healAmount, this.game.player.maxHealth);
@@ -97,6 +107,7 @@ class EventSystem {
     }
 
     experienceEvent() {
+        console.log("Событие: получение опыта");
         const expAmount = 15 + Math.floor(Math.random() * 25) + this.game.currentLevel * 5;
         const levelsGained = this.game.player.gainExp(expAmount);
         
@@ -114,6 +125,7 @@ class EventSystem {
     }
 
     discoveryEvent() {
+        console.log("Событие: открытие");
         const discoveries = [
             {
                 title: "Таинственный алтарь",
@@ -163,11 +175,14 @@ class EventSystem {
     }
 
     startBattleEvent() {
+        console.log("Событие: начало боя");
         this.game.addLogEntry("Внезапно вас атакуют враги!", "damage");
         this.game.startBattle();
     }
 
     showEventResult(title, description, rewards) {
+        console.log("Показ результата события:", title);
+        
         const eventResult = document.getElementById('eventResult');
         const eventTitle = document.getElementById('eventTitle');
         const eventDescription = document.getElementById('eventDescription');
