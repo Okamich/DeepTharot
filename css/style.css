@@ -129,7 +129,6 @@ button:disabled {
     display: flex;
     flex-direction: column;
     background: #1a1a1a;
-    position: relative;
 }
 
 .activity-log {
@@ -195,7 +194,6 @@ button:disabled {
     align-items: center;
     padding: 20px;
     position: relative;
-    width: 100%;
 }
 
 /* Стили для режима исследования */
@@ -203,7 +201,6 @@ button:disabled {
     text-align: center;
     width: 100%;
     max-width: 800px;
-    margin: 0 auto;
 }
 
 .location-image {
@@ -238,9 +235,6 @@ button:disabled {
     border-radius: 8px;
     border: 2px solid #444;
     margin-bottom: 20px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .event-title {
@@ -283,15 +277,6 @@ button:disabled {
 .battle-view {
     width: 100%;
     display: none;
-    text-align: center;
-}
-
-.combatants-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
 }
 
 .combatants {
@@ -299,15 +284,13 @@ button:disabled {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 60px;
-    padding: 0 20px;
+    max-width: 800px;
+    margin-bottom: 30px;
 }
 
 .character {
     text-align: center;
     position: relative;
-    flex-shrink: 0;
-    min-width: 120px;
 }
 
 .character-avatar {
@@ -351,7 +334,7 @@ button:disabled {
     height: 20px;
     background: #333;
     border-radius: 10px;
-    margin: 0 auto 20px;
+    margin-bottom: 20px;
     overflow: hidden;
     position: relative;
 }
@@ -375,8 +358,6 @@ button:disabled {
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
-    flex: 1;
-    max-width: 600px;
 }
 
 .zone-info {
@@ -393,13 +374,6 @@ button:disabled {
 .zone-description {
     color: #bbb;
     margin-bottom: 15px;
-}
-
-.battle-controls {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 20px;
 }
 
 .auto-battle-indicator {
@@ -452,7 +426,6 @@ button:disabled {
     max-width: 600px;
     max-height: 80vh;
     overflow-y: auto;
-    position: relative;
 }
 
 .close {
@@ -461,9 +434,6 @@ button:disabled {
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 15px;
 }
 
 .close:hover {
@@ -514,177 +484,4 @@ button:disabled {
     right: 5px;
     font-size: 10px;
     color: #ffd700;
-}
-
-/* Адаптивность */
-@media (max-width: 1024px) {
-    .combatants {
-        gap: 40px;
-    }
-    
-    .enemies-container {
-        max-width: 500px;
-    }
-}
-
-@media (max-width: 768px) {
-    .game-container {
-        flex-direction: column;
-    }
-    
-    .side-panel {
-        width: 100%;
-        border-right: none;
-        border-bottom: 2px solid #444;
-        max-height: 40vh;
-    }
-    
-    .combatants {
-        flex-direction: column;
-        gap: 30px;
-    }
-    
-    .enemies-container {
-        max-width: 100%;
-        order: -1;
-    }
-    
-    .character {
-        min-width: auto;
-    }
-    
-    .combatants-container {
-        max-width: 100%;
-    }
-    
-    .location-image {
-        width: 150px;
-        height: 150px;
-        font-size: 36px;
-    }
-    
-    .location-title {
-        font-size: 24px;
-    }
-    
-    .inventory-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .auto-battle-indicator,
-    .mode-indicator {
-        position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
-        display: inline-block;
-        margin: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .inventory-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .event-rewards {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .combatants {
-        gap: 20px;
-        padding: 0 10px;
-    }
-    
-    .character-avatar {
-        width: 60px;
-        height: 60px;
-        font-size: 18px;
-    }
-    
-    .enemies-container {
-        gap: 15px;
-    }
-}
-
-/* Дополнительные utility классы */
-.text-center {
-    text-align: center;
-}
-
-.mb-10 {
-    margin-bottom: 10px;
-}
-
-.mb-20 {
-    margin-bottom: 20px;
-}
-
-.mt-10 {
-    margin-top: 10px;
-}
-
-.mt-20 {
-    margin-top: 20px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.flex {
-    display: flex;
-}
-
-.flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.flex-between {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.flex-column {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Стили для скроллбара */
-.activity-log::-webkit-scrollbar {
-    width: 8px;
-}
-
-.activity-log::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
-
-.activity-log::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 4px;
-}
-
-.activity-log::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-.side-panel::-webkit-scrollbar {
-    width: 6px;
-}
-
-.side-panel::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
-
-.side-panel::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 3px;
-}
-
-.side-panel::-webkit-scrollbar-thumb:hover {
-    background: #555;
 }
