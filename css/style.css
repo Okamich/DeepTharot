@@ -671,6 +671,26 @@ button:disabled {
     100% { transform: scale(1); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); }
 }
 
+/* Анимации для боя */
+@keyframes attackAnimation {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(20px); }
+    100% { transform: translateX(0); }
+}
+
+.character-avatar.attacking {
+    animation: attackAnimation 0.3s ease;
+}
+
+@keyframes damageFlash {
+    0%, 100% { background: linear-gradient(145deg, #f44336, #d32f2f); }
+    50% { background: linear-gradient(145deg, #ff6b6b, #ff5252); }
+}
+
+.character-avatar.taking-damage {
+    animation: damageFlash 0.5s ease;
+}
+
 /* Модальные окна */
 .modal {
     display: none;
@@ -782,26 +802,6 @@ button:disabled {
     color: #ffd700;
     font-weight: bold;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Анимации для боя */
-@keyframes attackAnimation {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(20px); }
-    100% { transform: translateX(0); }
-}
-
-.character-avatar.attacking {
-    animation: attackAnimation 0.3s ease;
-}
-
-@keyframes damageFlash {
-    0%, 100% { background: linear-gradient(145deg, #f44336, #d32f2f); }
-    50% { background: linear-gradient(145deg, #ff6b6b, #ff5252); }
-}
-
-.character-avatar.taking-damage {
-    animation: damageFlash 0.5s ease;
 }
 
 /* Адаптивность */
