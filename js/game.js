@@ -81,7 +81,7 @@ class Game {
 
     updateUI() {
         this.updatePlayerInfo();
-        this.updateZoneInfo();
+        this.updateProgressInfo(); // Изменили на updateProgressInfo
         this.updateInitiativeBar();
     }
 
@@ -107,39 +107,83 @@ class Game {
         this.updateEquipment();
     }
 
-    updateZoneInfo() {
-        const zoneInfo = this.levels[this.currentLevel][this.currentZone - 1];
+    updateProgressInfo() {
+        // Обновляем информацию о прогрессе (уровень и зона)
         document.getElementById('currentLevel').textContent = this.currentLevel;
         document.getElementById('currentZone').textContent = this.currentZone;
         
-        const aliveEnemies = this.enemies.filter(e => e.health > 0).length;
-        document.getElementById('enemiesCount').textContent = `${aliveEnemies}/${this.enemies.length}`;
+        // Обновляем информацию о врагах только если мы в режиме боя
+        const enemiesCountElement = document.getElementById('enemiesCount');
+        if (enemiesCountElement) {
+            const aliveEnemies = this.enemies.filter(e => e.health > 0).length;
+            enemiesCountElement.textContent = `${aliveEnemies}/${this.enemies.length}`;
+        }
         
-        document.getElementById('zoneTitle').textContent = `Уровень ${this.currentLevel} - Зона ${this.currentZone}`;
-        document.getElementById('zoneDescription').textContent = 
-            `${zoneInfo.name} (${zoneInfo.minEnemies}-${zoneInfo.maxEnemies} противников)`;
+        // Обновляем информацию о зоне только если элемент существует (в режиме боя)
+        const zoneTitleElement = document.getElementById('zoneTitle');
+        const zoneDescriptionElement = document.getElementById('zoneDescription');
+        
+        if (zoneTitleElement && zoneDescriptionElement) {
+            const zoneInfo = this.levels[this.currentLevel][this.currentZone - 1];
+            zoneTitleElement.textContent = `Уровень ${this.currentLevel} - Зона ${this.currentZone}`;
+            zoneDescriptionElement.textContent = 
+                `${zoneInfo.name} (${zoneInfo.minEnemies}-${zoneInfo.maxEnemies} противников)`;
+        }
+    }
+
+    updateZoneInfo() {
+        // Этот метод теперь используется только для обновления информации в режиме боя
+        const zoneInfo = this.levels[this.currentLevel][this.currentZone - 1];
+        
+        const zoneTitleElement = document.getElementById('zoneTitle');
+        const zoneDescriptionElement = document.getElementById('zoneDescription');
+        const enemiesCountElement = document.getElementById('enemiesCount');
+        
+        if (zoneTitleElement) {
+            zoneTitleElement.textContent = `Уровень ${this.currentLevel} - Зона ${this.currentZone}`;
+        }
+        
+        if (zoneDescriptionElement) {
+            zoneDescriptionElement.textContent = 
+                `${zoneInfo.name} (${zoneInfo.minEnemies}-${zoneInfo.maxEnemies} противников)`;
+        }
+        
+        if (enemiesCountElement) {
+            const aliveEnemies = this.enemies.filter(e => e.health > 0).length;
+            enemiesCountElement.textContent = `${aliveEnemies}/${this.enemies.length}`;
+        }
     }
 
     updateInitiativeBar() {
         const initiativePercent = (this.initiative / this.maxInitiative) * 100;
-        document.getElementById('initiativeFill').style.width = `${initiativePercent}%`;
+        const initiativeFillElement = document.getElementById('initiativeFill');
+        if (initiativeFillElement) {
+            initiativeFillElement.style.width = `${initiativePercent}%`;
+        }
     }
 
     updateBattleStatus(message) {
-        document.getElementById('battleStatus').textContent = message;
+        const battleStatusElement = document.getElementById('battleStatus');
+        if (battleStatusElement) {
+            battleStatusElement.textContent = message;
+        }
     }
 
     updateActiveCharacter() {
         // Сбрасываем все активные состояния
-        document.getElementById('playerAvatar').classList.remove('active');
+        const playerAvatar = document.getElementById('playerAvatar');
+        if (playerAvatar) {
+            playerAvatar.classList.remove('active');
+        }
+        
         document.querySelectorAll('.enemy-avatar').forEach(avatar => {
             avatar.classList.remove('active');
         });
         
         // Устанавливаем активное состояние для текущего хода
         if (this.currentTurn) {
-            if (this.currentTurn.type === 'player') {
-                document.getElementById('playerAvatar').classList.add('active');
+            if (this.currentTurn.type === 'player' && playerAvatar) {
+                playerAvatar.classList.add('active');
             } else {
                 const enemyAvatars = document.querySelectorAll('.enemy-avatar');
                 if (enemyAvatars[this.currentTurn.index]) {
@@ -245,7 +289,7 @@ class Game {
         this.currentTurn = null;
         
         this.showBattleView();
-        this.updateZoneInfo();
+        this.updateZoneInfo(); // Теперь используем updateZoneInfo только для боя
         this.renderEnemies();
         this.addLogEntry(`Начало боя в зоне: ${zoneInfo.name}`, 'info');
         this.addLogEntry(`Появилось врагов: ${enemyCount}`, 'info');
@@ -402,10 +446,15 @@ class Game {
         document.getElementById('autoBattleIndicator').style.display = 'block';
         document.getElementById('modeIndicator').textContent = 'БОЙ';
         document.getElementById('modeIndicator').style.background = '#f44336';
+        
+        // Обновляем информацию о зоне при переходе в режим боя
+        this.updateZoneInfo();
     }
 
     renderEnemies() {
         const container = document.getElementById('enemiesContainer');
+        if (!container) return;
+        
         container.innerHTML = '';
         
         this.enemies.forEach((enemy, index) => {
