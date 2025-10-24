@@ -201,6 +201,7 @@ button:disabled {
     text-align: center;
     width: 100%;
     max-width: 800px;
+    margin: 0 auto;
 }
 
 .location-image {
@@ -285,7 +286,8 @@ button:disabled {
     align-items: center;
     width: 100%;
     max-width: 800px;
-    margin-bottom: 30px;
+    margin: 0 auto 30px; /* Добавим auto для центрирования */
+    position: relative;
 }
 
 .character {
@@ -334,7 +336,7 @@ button:disabled {
     height: 20px;
     background: #333;
     border-radius: 10px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px; /* Добавим auto для центрирования */
     overflow: hidden;
     position: relative;
 }
@@ -351,6 +353,21 @@ button:disabled {
     font-size: 18px;
     color: #4fc3f7;
     min-height: 27px;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.battle-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    width: 100%;
 }
 
 .enemies-container {
@@ -358,11 +375,16 @@ button:disabled {
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
+    flex: 1;
 }
 
 .zone-info {
     text-align: center;
     margin-bottom: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .zone-title {
