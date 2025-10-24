@@ -3,67 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idle RPG Game</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Idle RPG - Пошаговая игра</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Боковая панель с информацией */
+        .side-panel {
+            width: 300px;
+            background: #2a2a2a;
+            padding: 20px;
+            border-right: 2px solid #444;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        h3 {
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #444;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2196f3;
+            transition: width 0.3s ease;
+        }
+
+        .health-bar {
+            background: #443333;
+        }
+
+        .health-fill {
+            background: #4caf50;
+        }
+
+        .equipment-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #3a3a3a;
+            border-radius: 4px;
+            border: 1px solid #555;
+        }
+
+        .slot-content {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        button {
+            padding: 10px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        button:hover {
+            background: #1565c0;
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        /* Основная игровая область */
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+        }
+
+        .battle-log {
+            height: 200px;
+            background: #2a2a2a;
+            border-bottom: 2px solid #444;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .log-damage {
+            background: #443333;
+            color: #ff6b6b;
+        }
+
+        .log-heal {
+            background: #334433;
+            color: #6bff6b;
+        }
+
+        .log-info {
+            background: #333344;
+            color: #6b6bff;
+        }
+
+        .log-exp {
+            background: #443344;
+            color: #ff6bff;
+        }
+
+        .battle-field {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .combatants {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .character {
+            text-align: center;
+            position: relative;
+        }
+
+        .character-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #2196f3;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 3px solid #1976d2;
+        }
+
+        .enemy-avatar {
+            background: #f44336;
+            border-color: #d32f2f;
+        }
+
+        .character-name {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .character-stats {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .initiative-bar {
+            width: 100%;
+            max-width: 800px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .initiative-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            transition: width 0.5s ease;
+        }
+
+        .initiative-marker {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 30px;
+            background: #fff;
+            transform: translateX(-50%);
+        }
+
+        .battle-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background: #2a2a2a;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: white;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .inventory-item {
+            background: #333;
+            border: 2px solid #555;
+            border-radius: 4px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .inventory-item:hover {
+            border-color: #4fc3f7;
+            transform: translateY(-2px);
+        }
+
+        .inventory-item.equipped {
+            border-color: #4caf50;
+        }
+
+        .item-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .item-stats {
+            font-size: 10px;
+            color: #bbb;
+        }
+
+        .item-value {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 10px;
+            color: #ffd700;
+        }
+
+        .enemies-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .enemy {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .enemy:hover {
+            transform: scale(1.05);
+        }
+
+        .enemy.active {
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .zone-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .zone-title {
+            font-size: 24px;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+        }
+
+        .zone-description {
+            color: #bbb;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
     <div class="game-container">
-        <div class="game-canvas">
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-        </div>
-        
-        <div class="ui-panel">
-            <div class="player-info">
-                <h3>Информация об игроке</h3>
+        <!-- Боковая панель -->
+        <div class="side-panel">
+            <div class="panel-section">
+                <h3>Игрок</h3>
                 <div class="stat-row">
-                    <span>Уровень: </span>
+                    <span>Уровень:</span>
                     <span id="playerLevel">1</span>
                 </div>
                 <div class="stat-row">
-                    <span>Опыт: </span>
+                    <span>Опыт:</span>
                     <span id="playerExp">0/100</span>
                 </div>
                 <div class="progress-bar">
-                    <div id="expBar" class="progress-fill"></div>
+                    <div id="expBar" class="progress-fill" style="width: 0%"></div>
                 </div>
                 <div class="stat-row">
-                    <span>Здоровье: </span>
+                    <span>Здоровье:</span>
                     <span id="playerHealth">100/100</span>
                 </div>
                 <div class="progress-bar health-bar">
-                    <div id="healthBar" class="progress-fill health-fill"></div>
+                    <div id="healthBar" class="progress-fill health-fill" style="width: 100%"></div>
                 </div>
                 <div class="stat-row">
-                    <span>Урон: </span>
+                    <span>Урон:</span>
                     <span id="playerDamage">10</span>
                 </div>
                 <div class="stat-row">
-                    <span>Защита: </span>
+                    <span>Защита:</span>
                     <span id="playerDefense">5</span>
                 </div>
                 <div class="stat-row">
-                    <span>Скорость: </span>
-                    <span id="playerSpeed">3</span>
+                    <span>Скорость:</span>
+                    <span id="playerSpeed">10</span>
                 </div>
                 <div class="stat-row">
-                    <span>Золото: </span>
+                    <span>Золото:</span>
                     <span id="playerGold">0</span>
                 </div>
             </div>
-            
-            <div class="zone-info">
-                <h3>Информация о зоне</h3>
-                <div class="stat-row">
-                    <span>Текущая зона: </span>
-                    <span id="currentZone">1</span>
-                </div>
-                <div class="stat-row">
-                    <span>Врагов осталось: </span>
-                    <span id="enemiesLeft">5</span>
-                </div>
-            </div>
-            
-            <div class="equipment">
+
+            <div class="panel-section">
                 <h3>Экипировка</h3>
                 <div class="equipment-slots">
                     <div class="slot" data-slot="weapon">
@@ -80,14 +428,71 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="controls">
+
+            <div class="panel-section">
+                <h3>Зона</h3>
+                <div class="stat-row">
+                    <span>Уровень:</span>
+                    <span id="currentLevel">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>Зона:</span>
+                    <span id="currentZone">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>Врагов:</span>
+                    <span id="enemiesCount">1/2</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Управление</h3>
                 <button id="inventoryBtn">Инвентарь (I)</button>
-                <button id="autoAttackBtn">Автоатака: Вкл</button>
+                <button id="nextTurnBtn" disabled>Следующий ход</button>
+                <button id="autoBattleBtn">Автобой: Выкл</button>
+            </div>
+        </div>
+
+        <!-- Основная игровая область -->
+        <div class="game-area">
+            <div class="battle-log" id="battleLog">
+                <div class="log-entry log-info">Добро пожаловать в Idle RPG! Начните сражение.</div>
+            </div>
+
+            <div class="battle-field">
+                <div class="zone-info">
+                    <div class="zone-title" id="zoneTitle">Уровень 1 - Зона 1</div>
+                    <div class="zone-description" id="zoneDescription">Слабая нежить (1-2 противника)</div>
+                </div>
+
+                <div class="initiative-bar" id="initiativeBar">
+                    <div class="initiative-fill" id="initiativeFill" style="width: 0%"></div>
+                    <div class="initiative-marker" id="initiativeMarker" style="left: 0%"></div>
+                </div>
+
+                <div class="combatants">
+                    <div class="character">
+                        <div class="character-avatar">P</div>
+                        <div class="character-name" id="playerName">Игрок</div>
+                        <div class="character-stats">
+                            HP: <span id="playerCurrentHealth">100</span>/<span id="playerMaxHealth">100</span>
+                        </div>
+                    </div>
+
+                    <div class="enemies-container" id="enemiesContainer">
+                        <!-- Враги будут добавляться здесь -->
+                    </div>
+                </div>
+
+                <div class="battle-controls">
+                    <button id="attackBtn" disabled>Атаковать</button>
+                    <button id="skillBtn" disabled>Умение (скоро)</button>
+                    <button id="fleeBtn" disabled>Сбежать (скоро)</button>
+                </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Модальное окно инвентаря -->
     <div id="inventoryModal" class="modal">
         <div class="modal-content">
@@ -103,10 +508,580 @@
         </div>
     </div>
 
-    <script src="js/item.js"></script>
-    <script src="js/enemy.js"></script>
-    <script src="js/player.js"></script>
-    <script src="js/zone.js"></script>
-    <script src="js/game.js"></script>
+    <script>
+        // Основные классы игры
+        class Game {
+            constructor() {
+                this.player = new Player();
+                this.currentLevel = 1;
+                this.currentZone = 1;
+                this.enemies = [];
+                this.battleActive = false;
+                this.autoBattle = false;
+                this.initiative = 0;
+                this.maxInitiative = 100;
+                this.currentTurn = null;
+                this.turnOrder = [];
+                
+                this.levels = {
+                    1: [
+                        { name: "Слабая нежить", minEnemies: 1, maxEnemies: 2, enemyLevel: 1 },
+                        { name: "Кладбище", minEnemies: 1, maxEnemies: 3, enemyLevel: 1 },
+                        { name: "Заброшенный храм", minEnemies: 2, maxEnemies: 3, enemyLevel: 2 }
+                    ],
+                    2: [
+                        { name: "Лес гоблинов", minEnemies: 2, maxEnemies: 3, enemyLevel: 2 },
+                        { name: "Пещера гоблинов", minEnemies: 2, maxEnemies: 4, enemyLevel: 2 },
+                        { name: "Логово вождя", minEnemies: 3, maxEnemies: 4, enemyLevel: 3 }
+                    ]
+                };
+
+                this.setupEventListeners();
+                this.startNewZone();
+                this.updateUI();
+                this.gameLoop();
+            }
+
+            setupEventListeners() {
+                document.getElementById('inventoryBtn').addEventListener('click', () => this.toggleInventory());
+                document.getElementById('nextTurnBtn').addEventListener('click', () => this.nextTurn());
+                document.getElementById('autoBattleBtn').addEventListener('click', () => this.toggleAutoBattle());
+                document.getElementById('attackBtn').addEventListener('click', () => this.playerAttack());
+                
+                document.querySelector('.close').addEventListener('click', () => this.closeInventory());
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'i' || e.key === 'I') {
+                        this.toggleInventory();
+                    } else if (e.key === ' ' && !this.autoBattle) {
+                        this.nextTurn();
+                    }
+                });
+
+                window.addEventListener('click', (e) => {
+                    const modal = document.getElementById('inventoryModal');
+                    if (e.target === modal) {
+                        this.closeInventory();
+                    }
+                });
+            }
+
+            startNewZone() {
+                const zoneInfo = this.levels[this.currentLevel][this.currentZone - 1];
+                this.enemies = [];
+                
+                const enemyCount = Math.floor(Math.random() * (zoneInfo.maxEnemies - zoneInfo.minEnemies + 1)) + zoneInfo.minEnemies;
+                
+                for (let i = 0; i < enemyCount; i++) {
+                    this.enemies.push(new Enemy(zoneInfo.enemyLevel, `Враг ${i + 1}`));
+                }
+                
+                this.battleActive = true;
+                this.initiative = 0;
+                this.turnOrder = [];
+                this.currentTurn = null;
+                
+                this.updateZoneInfo();
+                this.renderEnemies();
+                this.addLogEntry(`Начало зоны: ${zoneInfo.name}`, 'info');
+                this.addLogEntry(`Появилось врагов: ${enemyCount}`, 'info');
+                
+                document.getElementById('nextTurnBtn').disabled = false;
+            }
+
+            nextTurn() {
+                if (!this.battleActive) return;
+                
+                // Увеличиваем инициативу
+                this.initiative += this.player.speed;
+                this.enemies.forEach(enemy => {
+                    this.initiative += enemy.speed;
+                });
+                
+                if (this.initiative >= this.maxInitiative) {
+                    this.executeTurn();
+                    this.initiative = 0;
+                }
+                
+                this.updateInitiativeBar();
+                
+                // Если включен автобой, продолжаем автоматически
+                if (this.autoBattle && this.battleActive) {
+                    setTimeout(() => this.nextTurn(), 500);
+                }
+            }
+
+            executeTurn() {
+                // Определяем порядок ходов на основе скорости
+                this.turnOrder = [
+                    { type: 'player', speed: this.player.speed },
+                    ...this.enemies.map((enemy, index) => ({ type: 'enemy', index, speed: enemy.speed }))
+                ].sort((a, b) => b.speed - a.speed);
+                
+                this.processTurnOrder(0);
+            }
+
+            processTurnOrder(index) {
+                if (index >= this.turnOrder.length) {
+                    this.currentTurn = null;
+                    return;
+                }
+                
+                const turn = this.turnOrder[index];
+                this.currentTurn = turn;
+                
+                if (turn.type === 'player') {
+                    // Ход игрока
+                    document.getElementById('attackBtn').disabled = false;
+                    this.addLogEntry('Ваш ход! Выберите действие.', 'info');
+                } else {
+                    // Ход врага
+                    document.getElementById('attackBtn').disabled = true;
+                    setTimeout(() => {
+                        this.enemyAttack(turn.index);
+                        this.processTurnOrder(index + 1);
+                    }, 1000);
+                }
+            }
+
+            playerAttack() {
+                if (this.currentTurn?.type !== 'player') return;
+                
+                const aliveEnemies = this.enemies.filter(e => e.health > 0);
+                if (aliveEnemies.length === 0) return;
+                
+                // Атакуем случайного врага
+                const targetIndex = Math.floor(Math.random() * aliveEnemies.length);
+                const target = aliveEnemies[targetIndex];
+                const damage = this.player.attack(target);
+                
+                this.addLogEntry(`Вы атаковали ${target.name} и нанесли ${damage} урона!`, 'damage');
+                this.renderEnemies();
+                
+                // Проверяем смерть врага
+                if (target.health <= 0) {
+                    this.addLogEntry(`${target.name} повержен!`, 'info');
+                    const expGained = this.player.gainExp(target.expReward);
+                    this.player.gold += target.goldReward;
+                    
+                    if (expGained > 0) {
+                        this.addLogEntry(`Получено ${expGained} опыта!`, 'exp');
+                    }
+                    
+                    this.addLogEntry(`Получено ${target.goldReward} золота!`, 'info');
+                    
+                    // Проверяем окончание боя
+                    if (this.enemies.every(e => e.health <= 0)) {
+                        this.zoneCompleted();
+                        return;
+                    }
+                }
+                
+                document.getElementById('attackBtn').disabled = true;
+                this.processTurnOrder(this.turnOrder.indexOf(this.currentTurn) + 1);
+            }
+
+            enemyAttack(enemyIndex) {
+                const enemy = this.enemies[enemyIndex];
+                if (enemy.health <= 0) {
+                    this.processTurnOrder(this.turnOrder.indexOf(this.currentTurn) + 1);
+                    return;
+                }
+                
+                const damage = enemy.attack(this.player);
+                this.addLogEntry(`${enemy.name} атаковал вас и нанес ${damage} урона!`, 'damage');
+                this.updatePlayerInfo();
+                
+                // Проверяем смерть игрока
+                if (this.player.health <= 0) {
+                    this.addLogEntry('Вы погибли! Воскрешение...', 'damage');
+                    this.player.respawn();
+                    this.updatePlayerInfo();
+                }
+            }
+
+            zoneCompleted() {
+                this.battleActive = false;
+                this.addLogEntry('Зона очищена!', 'info');
+                
+                // Выдаем случайную награду
+                if (Math.random() < 0.5) {
+                    const itemTypes = ['weapon', 'armor', 'accessory'];
+                    const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+                    const item = new Item(itemType, this.currentLevel);
+                    this.player.addItem(item);
+                    this.addLogEntry(`Получено: ${item.name}`, 'info');
+                }
+                
+                // Переходим к следующей зоне или уровню
+                setTimeout(() => {
+                    if (this.currentZone < this.levels[this.currentLevel].length) {
+                        this.currentZone++;
+                    } else {
+                        this.currentLevel++;
+                        this.currentZone = 1;
+                        this.addLogEntry(`Достигнут уровень ${this.currentLevel}!`, 'exp');
+                    }
+                    
+                    this.startNewZone();
+                }, 2000);
+                
+                document.getElementById('nextTurnBtn').disabled = true;
+                document.getElementById('attackBtn').disabled = true;
+            }
+
+            toggleAutoBattle() {
+                this.autoBattle = !this.autoBattle;
+                document.getElementById('autoBattleBtn').textContent = 
+                    `Автобой: ${this.autoBattle ? 'Вкл' : 'Выкл'}`;
+                
+                if (this.autoBattle && this.battleActive) {
+                    this.nextTurn();
+                }
+            }
+
+            updateUI() {
+                this.updatePlayerInfo();
+                this.updateZoneInfo();
+                this.updateInitiativeBar();
+            }
+
+            updatePlayerInfo() {
+                const p = this.player;
+                document.getElementById('playerLevel').textContent = p.level;
+                document.getElementById('playerExp').textContent = `${p.exp}/${p.expToNextLevel}`;
+                document.getElementById('playerHealth').textContent = `${p.health}/${p.maxHealth}`;
+                document.getElementById('playerDamage').textContent = p.damage;
+                document.getElementById('playerDefense').textContent = p.defense;
+                document.getElementById('playerSpeed').textContent = p.speed;
+                document.getElementById('playerGold').textContent = p.gold;
+                
+                document.getElementById('playerCurrentHealth').textContent = p.health;
+                document.getElementById('playerMaxHealth').textContent = p.maxHealth;
+                
+                const expPercent = (p.exp / p.expToNextLevel) * 100;
+                const healthPercent = (p.health / p.maxHealth) * 100;
+                
+                document.getElementById('expBar').style.width = `${expPercent}%`;
+                document.getElementById('healthBar').style.width = `${healthPercent}%`;
+                
+                this.updateEquipment();
+            }
+
+            updateZoneInfo() {
+                const zoneInfo = this.levels[this.currentLevel][this.currentZone - 1];
+                document.getElementById('currentLevel').textContent = this.currentLevel;
+                document.getElementById('currentZone').textContent = this.currentZone;
+                
+                const aliveEnemies = this.enemies.filter(e => e.health > 0).length;
+                document.getElementById('enemiesCount').textContent = `${aliveEnemies}/${this.enemies.length}`;
+                
+                document.getElementById('zoneTitle').textContent = `Уровень ${this.currentLevel} - Зона ${this.currentZone}`;
+                document.getElementById('zoneDescription').textContent = 
+                    `${zoneInfo.name} (${zoneInfo.minEnemies}-${zoneInfo.maxEnemies} противников)`;
+            }
+
+            updateInitiativeBar() {
+                const initiativePercent = (this.initiative / this.maxInitiative) * 100;
+                document.getElementById('initiativeFill').style.width = `${initiativePercent}%`;
+            }
+
+            updateEquipment() {
+                const equipment = this.player.equipment;
+                document.getElementById('weaponSlot').textContent = 
+                    equipment.weapon ? equipment.weapon.name : 'Пусто';
+                document.getElementById('armorSlot').textContent = 
+                    equipment.armor ? equipment.armor.name : 'Пусто';
+                document.getElementById('accessorySlot').textContent = 
+                    equipment.accessory ? equipment.accessory.name : 'Пусто';
+            }
+
+            renderEnemies() {
+                const container = document.getElementById('enemiesContainer');
+                container.innerHTML = '';
+                
+                this.enemies.forEach((enemy, index) => {
+                    const enemyElement = document.createElement('div');
+                    enemyElement.className = 'character enemy';
+                    if (this.currentTurn?.type === 'enemy' && this.currentTurn.index === index) {
+                        enemyElement.classList.add('active');
+                    }
+                    
+                    enemyElement.innerHTML = `
+                        <div class="character-avatar enemy-avatar">E</div>
+                        <div class="character-name">${enemy.name}</div>
+                        <div class="character-stats">
+                            HP: ${enemy.health}/${enemy.maxHealth}
+                        </div>
+                    `;
+                    
+                    container.appendChild(enemyElement);
+                });
+            }
+
+            addLogEntry(message, type = 'info') {
+                const log = document.getElementById('battleLog');
+                const entry = document.createElement('div');
+                entry.className = `log-entry log-${type}`;
+                entry.textContent = message;
+                log.appendChild(entry);
+                log.scrollTop = log.scrollHeight;
+            }
+
+            toggleInventory() {
+                const modal = document.getElementById('inventoryModal');
+                if (modal.style.display === 'block') {
+                    this.closeInventory();
+                } else {
+                    this.openInventory();
+                }
+            }
+
+            openInventory() {
+                const modal = document.getElementById('inventoryModal');
+                const inventoryGrid = document.getElementById('inventoryGrid');
+                
+                inventoryGrid.innerHTML = '';
+                
+                this.player.inventory.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'inventory-item';
+                    if (this.player.equipment[item.type] === item) {
+                        itemElement.classList.add('equipped');
+                    }
+                    
+                    itemElement.innerHTML = `
+                        <div class="item-value">${item.value}G</div>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-stats">
+                            ${item.damageBonus ? `Урон: +${item.damageBonus}<br>` : ''}
+                            ${item.defenseBonus ? `Защ: +${item.defenseBonus}<br>` : ''}
+                            ${item.healthBonus ? `Здоровье: +${item.healthBonus}` : ''}
+                        </div>
+                    `;
+                    
+                    itemElement.addEventListener('click', (e) => {
+                        if (e.button === 0) { // ЛКМ
+                            this.player.toggleEquipment(item);
+                            this.openInventory();
+                            this.updatePlayerInfo();
+                        }
+                    });
+                    
+                    itemElement.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        this.player.sellItem(item);
+                        this.openInventory();
+                        this.updatePlayerInfo();
+                    });
+                    
+                    inventoryGrid.appendChild(itemElement);
+                });
+                
+                modal.style.display = 'block';
+            }
+
+            closeInventory() {
+                document.getElementById('inventoryModal').style.display = 'none';
+            }
+
+            gameLoop() {
+                this.updateUI();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+        }
+
+        class Player {
+            constructor() {
+                this.level = 1;
+                this.exp = 0;
+                this.expToNextLevel = 100;
+                this.gold = 0;
+                this.maxHealth = 100;
+                this.health = this.maxHealth;
+                this.damage = 10;
+                this.defense = 5;
+                this.speed = 10;
+                
+                this.equipment = {
+                    weapon: null,
+                    armor: null,
+                    accessory: null
+                };
+                
+                this.inventory = [];
+            }
+
+            attack(target) {
+                let totalDamage = this.damage;
+                if (this.equipment.weapon) {
+                    totalDamage += this.equipment.weapon.damageBonus;
+                }
+                if (this.equipment.accessory) {
+                    totalDamage += this.equipment.accessory.damageBonus;
+                }
+                
+                return target.takeDamage(totalDamage);
+            }
+
+            takeDamage(damage) {
+                let totalDefense = this.defense;
+                if (this.equipment.armor) {
+                    totalDefense += this.equipment.armor.defenseBonus;
+                }
+                if (this.equipment.accessory) {
+                    totalDefense += this.equipment.accessory.defenseBonus;
+                }
+                
+                const actualDamage = Math.max(1, damage - totalDefense);
+                this.health -= actualDamage;
+                return actualDamage;
+            }
+
+            gainExp(amount) {
+                this.exp += amount;
+                let levelsGained = 0;
+                
+                while (this.exp >= this.expToNextLevel) {
+                    this.exp -= this.expToNextLevel;
+                    this.levelUp();
+                    levelsGained++;
+                }
+                
+                return levelsGained > 0 ? amount : 0;
+            }
+
+            levelUp() {
+                this.level++;
+                this.expToNextLevel = Math.floor(this.expToNextLevel * 1.5);
+                
+                this.maxHealth += 20;
+                this.health = this.maxHealth;
+                this.damage += 5;
+                this.defense += 2;
+                this.speed += 1;
+            }
+
+            addItem(item) {
+                this.inventory.push(item);
+            }
+
+            toggleEquipment(item) {
+                if (this.equipment[item.type] === item) {
+                    this.unequipItem(item.type);
+                } else {
+                    this.equipItem(item);
+                }
+            }
+
+            equipItem(item) {
+                if (this.equipment[item.type]) {
+                    this.unequipItem(item.type);
+                }
+                
+                this.equipment[item.type] = item;
+                
+                if (item.damageBonus) this.damage += item.damageBonus;
+                if (item.defenseBonus) this.defense += item.defenseBonus;
+                if (item.healthBonus) {
+                    this.maxHealth += item.healthBonus;
+                    this.health += item.healthBonus;
+                }
+            }
+
+            unequipItem(itemType) {
+                const item = this.equipment[itemType];
+                if (!item) return;
+                
+                if (item.damageBonus) this.damage -= item.damageBonus;
+                if (item.defenseBonus) this.defense -= item.defenseBonus;
+                if (item.healthBonus) {
+                    this.maxHealth -= item.healthBonus;
+                    this.health = Math.min(this.health, this.maxHealth);
+                }
+                
+                this.equipment[itemType] = null;
+            }
+
+            sellItem(item) {
+                if (this.equipment[item.type] === item) {
+                    this.unequipItem(item.type);
+                }
+                
+                this.gold += item.value;
+                this.inventory = this.inventory.filter(i => i !== item);
+            }
+
+            respawn() {
+                this.health = this.maxHealth;
+                this.gold = Math.max(0, this.gold - 10);
+            }
+        }
+
+        class Enemy {
+            constructor(level, name) {
+                this.level = level;
+                this.name = name;
+                this.maxHealth = 30 + level * 15;
+                this.health = this.maxHealth;
+                this.damage = 5 + level * 2;
+                this.defense = level;
+                this.speed = 8 + level;
+                this.expReward = 10 + level * 5;
+                this.goldReward = 5 + level * 2;
+            }
+
+            attack(target) {
+                return target.takeDamage(this.damage);
+            }
+
+            takeDamage(damage) {
+                const actualDamage = Math.max(1, damage - this.defense);
+                this.health -= actualDamage;
+                return actualDamage;
+            }
+        }
+
+        class Item {
+            constructor(type, level) {
+                this.type = type;
+                this.level = level;
+                this.name = `${this.getTypeName()} Ур. ${level}`;
+                this.value = 10 * level;
+                
+                switch (type) {
+                    case 'weapon':
+                        this.damageBonus = 3 + level * 2;
+                        this.defenseBonus = 0;
+                        this.healthBonus = 0;
+                        break;
+                    case 'armor':
+                        this.damageBonus = 0;
+                        this.defenseBonus = 2 + level;
+                        this.healthBonus = 10 + level * 3;
+                        break;
+                    case 'accessory':
+                        this.damageBonus = 1 + level;
+                        this.defenseBonus = 1 + level;
+                        this.healthBonus = 5 + level * 2;
+                        break;
+                }
+            }
+
+            getTypeName() {
+                const names = {
+                    'weapon': 'Оружие',
+                    'armor': 'Броня',
+                    'accessory': 'Аксессуар'
+                };
+                return names[this.type];
+            }
+        }
+
+        // Запуск игры
+        window.addEventListener('load', () => {
+            new Game();
+        });
+    </script>
 </body>
 </html>
