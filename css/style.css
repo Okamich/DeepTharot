@@ -14,31 +14,22 @@ body {
 .game-container {
     display: flex;
     height: 100vh;
-    padding: 20px;
-    gap: 20px;
 }
 
-.game-canvas {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#gameCanvas {
-    border: 2px solid #333;
-    background: #000;
-}
-
-.ui-panel {
+/* Боковая панель с информацией */
+.side-panel {
     width: 300px;
+    background: #2a2a2a;
+    padding: 20px;
+    border-right: 2px solid #444;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    overflow-y: auto;
 }
 
-.player-info, .zone-info, .equipment, .controls {
-    background: #2a2a2a;
+.panel-section {
+    background: #333;
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #444;
@@ -81,6 +72,14 @@ h3 {
     background: #4caf50;
 }
 
+.exploration-bar {
+    background: #334433;
+}
+
+.exploration-fill {
+    background: #8bc34a;
+}
+
 .equipment-slots {
     display: flex;
     flex-direction: column;
@@ -92,7 +91,7 @@ h3 {
     justify-content: space-between;
     align-items: center;
     padding: 8px;
-    background: #333;
+    background: #3a3a3a;
     border-radius: 4px;
     border: 1px solid #555;
 }
@@ -100,12 +99,6 @@ h3 {
 .slot-content {
     font-size: 12px;
     color: #bbb;
-}
-
-.controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
 }
 
 button {
@@ -117,13 +110,302 @@ button {
     cursor: pointer;
     font-size: 14px;
     transition: background 0.3s;
+    width: 100%;
+    margin-bottom: 5px;
 }
 
 button:hover {
     background: #1565c0;
 }
 
-/* Модальное окно */
+button:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+/* Основная игровая область */
+.game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #1a1a1a;
+}
+
+.activity-log {
+    height: 200px;
+    background: #2a2a2a;
+    border-bottom: 2px solid #444;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 14px;
+}
+
+.log-entry {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.log-damage {
+    background: #443333;
+    color: #ff6b6b;
+}
+
+.log-heal {
+    background: #334433;
+    color: #6bff6b;
+}
+
+.log-info {
+    background: #333344;
+    color: #6b6bff;
+}
+
+.log-exp {
+    background: #443344;
+    color: #ff6bff;
+}
+
+.log-levelup {
+    background: #444433;
+    color: #ffff6b;
+}
+
+.log-gold {
+    background: #444433;
+    color: #ffd700;
+}
+
+.log-event {
+    background: #334444;
+    color: #6bffff;
+}
+
+.log-exploration {
+    background: #333366;
+    color: #aaaaff;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+/* Стили для режима исследования */
+.exploration-view {
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+}
+
+.location-image {
+    width: 200px;
+    height: 200px;
+    background: #333;
+    border-radius: 10px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    border: 3px solid #444;
+}
+
+.location-title {
+    font-size: 28px;
+    color: #4fc3f7;
+    margin-bottom: 10px;
+}
+
+.location-description {
+    font-size: 16px;
+    color: #bbb;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.event-result {
+    background: #333;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #444;
+    margin-bottom: 20px;
+}
+
+.event-title {
+    font-size: 20px;
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+.event-description {
+    font-size: 16px;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.event-rewards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.reward-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.reward-icon {
+    font-size: 18px;
+}
+
+.exploration-progress {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+/* Стили для режима боя */
+.battle-view {
+    width: 100%;
+    display: none;
+}
+
+.combatants {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 30px;
+}
+
+.character {
+    text-align: center;
+    position: relative;
+}
+
+.character-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #2196f3;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 3px solid #1976d2;
+    transition: all 0.3s ease;
+}
+
+.character-avatar.active {
+    border-color: #ffd700;
+    box-shadow: 0 0 20px #ffd700;
+    transform: scale(1.1);
+}
+
+.enemy-avatar {
+    background: #f44336;
+    border-color: #d32f2f;
+}
+
+.character-name {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.character-stats {
+    font-size: 12px;
+    color: #bbb;
+}
+
+.initiative-bar {
+    width: 100%;
+    max-width: 800px;
+    height: 20px;
+    background: #333;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+.initiative-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    transition: width 0.5s ease;
+}
+
+.battle-status {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #4fc3f7;
+    min-height: 27px;
+}
+
+.enemies-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.zone-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.zone-title {
+    font-size: 24px;
+    color: #4fc3f7;
+    margin-bottom: 10px;
+}
+
+.zone-description {
+    color: #bbb;
+    margin-bottom: 15px;
+}
+
+.auto-battle-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    animation: pulse 2s infinite;
+}
+
+.mode-indicator {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: #2196f3;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Модальные окна */
 .modal {
     display: none;
     position: fixed;
@@ -160,7 +442,7 @@ button:hover {
 
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     margin: 20px 0;
 }
@@ -202,17 +484,4 @@ button:hover {
     right: 5px;
     font-size: 10px;
     color: #ffd700;
-}
-
-.inventory-help {
-    margin-top: 20px;
-    padding: 10px;
-    background: #333;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #bbb;
-}
-
-.inventory-help p {
-    margin-bottom: 5px;
 }
