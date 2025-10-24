@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idle RPG - Пошаговая игра</title>
+    <title>Idle RPG - Автоматический пошаговый бой</title>
     <style>
         * {
             margin: 0;
@@ -165,6 +165,11 @@
             color: #ff6bff;
         }
 
+        .log-levelup {
+            background: #444433;
+            color: #ffff6b;
+        }
+
         .battle-field {
             flex: 1;
             display: flex;
@@ -200,6 +205,13 @@
             justify-content: center;
             font-size: 24px;
             border: 3px solid #1976d2;
+            transition: all 0.3s ease;
+        }
+
+        .character-avatar.active {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px #ffd700;
+            transform: scale(1.1);
         }
 
         .enemy-avatar {
@@ -234,18 +246,35 @@
             transition: width 0.5s ease;
         }
 
-        .initiative-marker {
-            position: absolute;
-            top: -5px;
-            width: 4px;
-            height: 30px;
-            background: #fff;
-            transform: translateX(-50%);
+        .battle-status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #4fc3f7;
+            min-height: 27px;
         }
 
-        .battle-controls {
+        .enemies-container {
             display: flex;
-            gap: 10px;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .zone-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .zone-title {
+            font-size: 24px;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+        }
+
+        .zone-description {
+            color: #bbb;
+            margin-bottom: 15px;
         }
 
         /* Модальные окна */
@@ -329,43 +358,22 @@
             color: #ffd700;
         }
 
-        .enemies-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .auto-battle-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            animation: pulse 2s infinite;
         }
 
-        .enemy {
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .enemy:hover {
-            transform: scale(1.05);
-        }
-
-        .enemy.active {
-            border: 2px solid #ffd700;
-            border-radius: 8px;
-            padding: 5px;
-        }
-
-        .zone-info {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .zone-title {
-            font-size: 24px;
-            color: #4fc3f7;
-            margin-bottom: 10px;
-        }
-
-        .zone-description {
-            color: #bbb;
-            margin-bottom: 15px;
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
@@ -448,15 +456,16 @@
             <div class="panel-section">
                 <h3>Управление</h3>
                 <button id="inventoryBtn">Инвентарь (I)</button>
-                <button id="nextTurnBtn" disabled>Следующий ход</button>
-                <button id="autoBattleBtn">Автобой: Выкл</button>
+                <button id="pauseBtn">Пауза</button>
             </div>
         </div>
 
         <!-- Основная игровая область -->
         <div class="game-area">
+            <div class="auto-battle-indicator" id="autoBattleIndicator">АВТОБОЙ</div>
+            
             <div class="battle-log" id="battleLog">
-                <div class="log-entry log-info">Добро пожаловать в Idle RPG! Начните сражение.</div>
+                <div class="log-entry log-info">Добро пожаловать в Idle RPG! Бой начинается автоматически.</div>
             </div>
 
             <div class="battle-field">
@@ -467,12 +476,13 @@
 
                 <div class="initiative-bar" id="initiativeBar">
                     <div class="initiative-fill" id="initiativeFill" style="width: 0%"></div>
-                    <div class="initiative-marker" id="initiativeMarker" style="left: 0%"></div>
                 </div>
+
+                <div class="battle-status" id="battleStatus">Подготовка к бою...</div>
 
                 <div class="combatants">
                     <div class="character">
-                        <div class="character-avatar">P</div>
+                        <div class="character-avatar" id="playerAvatar">P</div>
                         <div class="character-name" id="playerName">Игрок</div>
                         <div class="character-stats">
                             HP: <span id="playerCurrentHealth">100</span>/<span id="playerMaxHealth">100</span>
@@ -482,12 +492,6 @@
                     <div class="enemies-container" id="enemiesContainer">
                         <!-- Враги будут добавляться здесь -->
                     </div>
-                </div>
-
-                <div class="battle-controls">
-                    <button id="attackBtn" disabled>Атаковать</button>
-                    <button id="skillBtn" disabled>Умение (скоро)</button>
-                    <button id="fleeBtn" disabled>Сбежать (скоро)</button>
                 </div>
             </div>
         </div>
@@ -516,12 +520,13 @@
                 this.currentLevel = 1;
                 this.currentZone = 1;
                 this.enemies = [];
-                this.battleActive = false;
-                this.autoBattle = false;
+                this.battleActive = true;
+                this.paused = false;
                 this.initiative = 0;
                 this.maxInitiative = 100;
                 this.currentTurn = null;
                 this.turnOrder = [];
+                this.battleSpeed = 1000; // Скорость боя в ms
                 
                 this.levels = {
                     1: [
@@ -533,28 +538,31 @@
                         { name: "Лес гоблинов", minEnemies: 2, maxEnemies: 3, enemyLevel: 2 },
                         { name: "Пещера гоблинов", minEnemies: 2, maxEnemies: 4, enemyLevel: 2 },
                         { name: "Логово вождя", minEnemies: 3, maxEnemies: 4, enemyLevel: 3 }
+                    ],
+                    3: [
+                        { name: "Горный перевал", minEnemies: 3, maxEnemies: 4, enemyLevel: 3 },
+                        { name: "Орочья крепость", minEnemies: 3, maxEnemies: 5, enemyLevel: 4 },
+                        { name: "Тронный зал", minEnemies: 4, maxEnemies: 5, enemyLevel: 5 }
                     ]
                 };
 
                 this.setupEventListeners();
                 this.startNewZone();
                 this.updateUI();
-                this.gameLoop();
+                this.startBattleLoop();
             }
 
             setupEventListeners() {
                 document.getElementById('inventoryBtn').addEventListener('click', () => this.toggleInventory());
-                document.getElementById('nextTurnBtn').addEventListener('click', () => this.nextTurn());
-                document.getElementById('autoBattleBtn').addEventListener('click', () => this.toggleAutoBattle());
-                document.getElementById('attackBtn').addEventListener('click', () => this.playerAttack());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
                 
                 document.querySelector('.close').addEventListener('click', () => this.closeInventory());
                 
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'i' || e.key === 'I') {
                         this.toggleInventory();
-                    } else if (e.key === ' ' && !this.autoBattle) {
-                        this.nextTurn();
+                    } else if (e.key === ' ' || e.key === 'Spacebar') {
+                        this.togglePause();
                     }
                 });
 
@@ -585,8 +593,16 @@
                 this.renderEnemies();
                 this.addLogEntry(`Начало зоны: ${zoneInfo.name}`, 'info');
                 this.addLogEntry(`Появилось врагов: ${enemyCount}`, 'info');
-                
-                document.getElementById('nextTurnBtn').disabled = false;
+            }
+
+            startBattleLoop() {
+                const battleStep = () => {
+                    if (!this.paused && this.battleActive) {
+                        this.nextTurn();
+                    }
+                    setTimeout(battleStep, this.battleSpeed);
+                };
+                battleStep();
             }
 
             nextTurn() {
@@ -595,7 +611,9 @@
                 // Увеличиваем инициативу
                 this.initiative += this.player.speed;
                 this.enemies.forEach(enemy => {
-                    this.initiative += enemy.speed;
+                    if (enemy.health > 0) {
+                        this.initiative += enemy.speed;
+                    }
                 });
                 
                 if (this.initiative >= this.maxInitiative) {
@@ -604,19 +622,20 @@
                 }
                 
                 this.updateInitiativeBar();
-                
-                // Если включен автобой, продолжаем автоматически
-                if (this.autoBattle && this.battleActive) {
-                    setTimeout(() => this.nextTurn(), 500);
-                }
             }
 
             executeTurn() {
                 // Определяем порядок ходов на основе скорости
                 this.turnOrder = [
                     { type: 'player', speed: this.player.speed },
-                    ...this.enemies.map((enemy, index) => ({ type: 'enemy', index, speed: enemy.speed }))
-                ].sort((a, b) => b.speed - a.speed);
+                    ...this.enemies.map((enemy, index) => ({ 
+                        type: 'enemy', 
+                        index, 
+                        speed: enemy.speed,
+                        health: enemy.health 
+                    }))
+                ].filter(turn => turn.type === 'player' || turn.health > 0)
+                 .sort((a, b) => b.speed - a.speed);
                 
                 this.processTurnOrder(0);
             }
@@ -624,23 +643,26 @@
             processTurnOrder(index) {
                 if (index >= this.turnOrder.length) {
                     this.currentTurn = null;
+                    this.updateActiveCharacter();
                     return;
                 }
                 
                 const turn = this.turnOrder[index];
                 this.currentTurn = turn;
+                this.updateActiveCharacter();
                 
                 if (turn.type === 'player') {
-                    // Ход игрока
-                    document.getElementById('attackBtn').disabled = false;
-                    this.addLogEntry('Ваш ход! Выберите действие.', 'info');
+                    // Ход игрока - автоматическая атака
+                    setTimeout(() => {
+                        this.playerAttack();
+                        this.processTurnOrder(index + 1);
+                    }, 600);
                 } else {
                     // Ход врага
-                    document.getElementById('attackBtn').disabled = true;
                     setTimeout(() => {
                         this.enemyAttack(turn.index);
                         this.processTurnOrder(index + 1);
-                    }, 1000);
+                    }, 600);
                 }
             }
 
@@ -650,12 +672,13 @@
                 const aliveEnemies = this.enemies.filter(e => e.health > 0);
                 if (aliveEnemies.length === 0) return;
                 
-                // Атакуем случайного врага
+                // Атакуем случайного живого врага
                 const targetIndex = Math.floor(Math.random() * aliveEnemies.length);
                 const target = aliveEnemies[targetIndex];
                 const damage = this.player.attack(target);
                 
                 this.addLogEntry(`Вы атаковали ${target.name} и нанесли ${damage} урона!`, 'damage');
+                this.updateBattleStatus(`Атака по ${target.name}!`);
                 this.renderEnemies();
                 
                 // Проверяем смерть врага
@@ -665,7 +688,9 @@
                     this.player.gold += target.goldReward;
                     
                     if (expGained > 0) {
-                        this.addLogEntry(`Получено ${expGained} опыта!`, 'exp');
+                        this.addLogEntry(`Получено ${expGained} опыта! Уровень повышен!`, 'levelup');
+                    } else {
+                        this.addLogEntry(`Получено ${target.expReward} опыта!`, 'exp');
                     }
                     
                     this.addLogEntry(`Получено ${target.goldReward} золота!`, 'info');
@@ -676,20 +701,15 @@
                         return;
                     }
                 }
-                
-                document.getElementById('attackBtn').disabled = true;
-                this.processTurnOrder(this.turnOrder.indexOf(this.currentTurn) + 1);
             }
 
             enemyAttack(enemyIndex) {
                 const enemy = this.enemies[enemyIndex];
-                if (enemy.health <= 0) {
-                    this.processTurnOrder(this.turnOrder.indexOf(this.currentTurn) + 1);
-                    return;
-                }
+                if (enemy.health <= 0) return;
                 
                 const damage = enemy.attack(this.player);
                 this.addLogEntry(`${enemy.name} атаковал вас и нанес ${damage} урона!`, 'damage');
+                this.updateBattleStatus(`${enemy.name} атакует!`);
                 this.updatePlayerInfo();
                 
                 // Проверяем смерть игрока
@@ -697,12 +717,14 @@
                     this.addLogEntry('Вы погибли! Воскрешение...', 'damage');
                     this.player.respawn();
                     this.updatePlayerInfo();
+                    this.updateBattleStatus('Воскрешение...');
                 }
             }
 
             zoneCompleted() {
                 this.battleActive = false;
                 this.addLogEntry('Зона очищена!', 'info');
+                this.updateBattleStatus('Зона очищена!');
                 
                 // Выдаем случайную награду
                 if (Math.random() < 0.5) {
@@ -720,24 +742,18 @@
                     } else {
                         this.currentLevel++;
                         this.currentZone = 1;
-                        this.addLogEntry(`Достигнут уровень ${this.currentLevel}!`, 'exp');
+                        this.addLogEntry(`Достигнут уровень ${this.currentLevel}!`, 'levelup');
                     }
                     
                     this.startNewZone();
                 }, 2000);
-                
-                document.getElementById('nextTurnBtn').disabled = true;
-                document.getElementById('attackBtn').disabled = true;
             }
 
-            toggleAutoBattle() {
-                this.autoBattle = !this.autoBattle;
-                document.getElementById('autoBattleBtn').textContent = 
-                    `Автобой: ${this.autoBattle ? 'Вкл' : 'Выкл'}`;
-                
-                if (this.autoBattle && this.battleActive) {
-                    this.nextTurn();
-                }
+            togglePause() {
+                this.paused = !this.paused;
+                document.getElementById('pauseBtn').textContent = 
+                    this.paused ? 'Продолжить' : 'Пауза';
+                this.updateBattleStatus(this.paused ? 'ПАУЗА' : 'Бой продолжается...');
             }
 
             updateUI() {
@@ -786,6 +802,30 @@
                 document.getElementById('initiativeFill').style.width = `${initiativePercent}%`;
             }
 
+            updateBattleStatus(message) {
+                document.getElementById('battleStatus').textContent = message;
+            }
+
+            updateActiveCharacter() {
+                // Сбрасываем все активные состояния
+                document.getElementById('playerAvatar').classList.remove('active');
+                document.querySelectorAll('.enemy-avatar').forEach(avatar => {
+                    avatar.classList.remove('active');
+                });
+                
+                // Устанавливаем активное состояние для текущего хода
+                if (this.currentTurn) {
+                    if (this.currentTurn.type === 'player') {
+                        document.getElementById('playerAvatar').classList.add('active');
+                    } else {
+                        const enemyAvatars = document.querySelectorAll('.enemy-avatar');
+                        if (enemyAvatars[this.currentTurn.index]) {
+                            enemyAvatars[this.currentTurn.index].classList.add('active');
+                        }
+                    }
+                }
+            }
+
             updateEquipment() {
                 const equipment = this.player.equipment;
                 document.getElementById('weaponSlot').textContent = 
@@ -801,14 +841,13 @@
                 container.innerHTML = '';
                 
                 this.enemies.forEach((enemy, index) => {
+                    if (enemy.health <= 0) return;
+                    
                     const enemyElement = document.createElement('div');
                     enemyElement.className = 'character enemy';
-                    if (this.currentTurn?.type === 'enemy' && this.currentTurn.index === index) {
-                        enemyElement.classList.add('active');
-                    }
                     
                     enemyElement.innerHTML = `
-                        <div class="character-avatar enemy-avatar">E</div>
+                        <div class="character-avatar enemy-avatar" data-index="${index}">E</div>
                         <div class="character-name">${enemy.name}</div>
                         <div class="character-stats">
                             HP: ${enemy.health}/${enemy.maxHealth}
@@ -817,6 +856,8 @@
                     
                     container.appendChild(enemyElement);
                 });
+                
+                this.updateActiveCharacter();
             }
 
             addLogEntry(message, type = 'info') {
@@ -884,11 +925,6 @@
             closeInventory() {
                 document.getElementById('inventoryModal').style.display = 'none';
             }
-
-            gameLoop() {
-                this.updateUI();
-                requestAnimationFrame(() => this.gameLoop());
-            }
         }
 
         class Player {
@@ -901,7 +937,7 @@
                 this.health = this.maxHealth;
                 this.damage = 10;
                 this.defense = 5;
-                this.speed = 10;
+                this.speed = 12;
                 
                 this.equipment = {
                     weapon: null,
