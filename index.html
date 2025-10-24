@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle RPG Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-canvas">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+        </div>
+        
+        <div class="ui-panel">
+            <div class="player-info">
+                <h3>Информация об игроке</h3>
+                <div class="stat-row">
+                    <span>Уровень: </span>
+                    <span id="playerLevel">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>Опыт: </span>
+                    <span id="playerExp">0/100</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="expBar" class="progress-fill"></div>
+                </div>
+                <div class="stat-row">
+                    <span>Здоровье: </span>
+                    <span id="playerHealth">100/100</span>
+                </div>
+                <div class="progress-bar health-bar">
+                    <div id="healthBar" class="progress-fill health-fill"></div>
+                </div>
+                <div class="stat-row">
+                    <span>Урон: </span>
+                    <span id="playerDamage">10</span>
+                </div>
+                <div class="stat-row">
+                    <span>Защита: </span>
+                    <span id="playerDefense">5</span>
+                </div>
+                <div class="stat-row">
+                    <span>Скорость: </span>
+                    <span id="playerSpeed">3</span>
+                </div>
+                <div class="stat-row">
+                    <span>Золото: </span>
+                    <span id="playerGold">0</span>
+                </div>
+            </div>
+            
+            <div class="zone-info">
+                <h3>Информация о зоне</h3>
+                <div class="stat-row">
+                    <span>Текущая зона: </span>
+                    <span id="currentZone">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>Врагов осталось: </span>
+                    <span id="enemiesLeft">5</span>
+                </div>
+            </div>
+            
+            <div class="equipment">
+                <h3>Экипировка</h3>
+                <div class="equipment-slots">
+                    <div class="slot" data-slot="weapon">
+                        <span>Оружие</span>
+                        <div id="weaponSlot" class="slot-content">Пусто</div>
+                    </div>
+                    <div class="slot" data-slot="armor">
+                        <span>Броня</span>
+                        <div id="armorSlot" class="slot-content">Пусто</div>
+                    </div>
+                    <div class="slot" data-slot="accessory">
+                        <span>Аксессуар</span>
+                        <div id="accessorySlot" class="slot-content">Пусто</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="inventoryBtn">Инвентарь (I)</button>
+                <button id="autoAttackBtn">Автоатака: Вкл</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно инвентаря -->
+    <div id="inventoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Инвентарь</h2>
+            <div class="inventory-grid" id="inventoryGrid">
+                <!-- Предметы будут добавляться здесь -->
+            </div>
+            <div class="inventory-help">
+                <p>ЛКМ - экипировать/снять предмет</p>
+                <p>ПКМ - продать предмет</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/item.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/zone.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
