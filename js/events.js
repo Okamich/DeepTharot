@@ -71,11 +71,8 @@ class EventSystem {
             [{ type: "gold", amount: goldAmount }]
         );
         
-        // Проверяем что метод addLogEntry существует
         if (this.game.addLogEntry && typeof this.game.addLogEntry === 'function') {
             this.game.addLogEntry(`Вы нашли ${goldAmount} золотых монет!`, "gold");
-        } else {
-            console.error("Метод addLogEntry не найден!");
         }
     }
 
@@ -193,6 +190,7 @@ class EventSystem {
             this.game.addLogEntry("Внезапно вас атакуют враги!", "damage");
         }
         this.game.startBattle();
+        // UI обновится автоматически при переходе в режим боя
     }
 
     showEventResult(title, description, rewards) {
@@ -242,6 +240,9 @@ class EventSystem {
         });
         
         eventResult.style.display = 'block';
+        
+        // ОБНОВЛЯЕМ UI ПЕРЕД ПОКАЗОМ РЕЗУЛЬТАТА
+        this.game.updatePlayerInfo();
         
         // Скрываем результат события через 3 секунды
         setTimeout(() => {
