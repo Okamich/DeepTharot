@@ -49,24 +49,6 @@
             </div>
 
             <div class="panel-section">
-                <h3>Экипировка</h3>
-                <div class="equipment-slots">
-                    <div class="slot" data-slot="weapon">
-                        <span>⚔️ Оружие</span>
-                        <div id="weaponSlot" class="slot-content">Пусто</div>
-                    </div>
-                    <div class="slot" data-slot="armor">
-                        <span>🛡️ Броня</span>
-                        <div id="armorSlot" class="slot-content">Пусто</div>
-                    </div>
-                    <div class="slot" data-slot="accessory">
-                        <span>💍 Аксессуар</span>
-                        <div id="accessorySlot" class="slot-content">Пусто</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel-section">
                 <h3>Прогресс</h3>
                 <div class="stat-row">
                     <span>🎯 Уровень:</span>
@@ -87,7 +69,8 @@
 
             <div class="panel-section">
                 <h3>Управление</h3>
-                <button id="inventoryBtn">📦 Инвентарь (I)</button>
+                <button id="inventoryBtn">🎒 Инвентарь (I)</button>
+                <button id="equipmentBtn">⚔️ Экипировка (E)</button>
                 <button id="pauseBtn">⏸️ Пауза</button>
             </div>
         </div>
@@ -167,12 +150,87 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>🎒 Инвентарь</h2>
-            <div class="inventory-grid" id="inventoryGrid">
-                <!-- Предметы будут добавляться здесь -->
+            <div class="inventory-section">
+                <h3>📦 Предметы в инвентаре</h3>
+                <div class="inventory-grid" id="inventoryGrid">
+                    <!-- Предметы будут добавляться здесь -->
+                </div>
+                <div class="empty-inventory" id="emptyInventory" style="display: none;">
+                    <div class="empty-message">📭 Инвентарь пуст</div>
+                    <div class="empty-hint">Исследуйте мир, чтобы найти предметы!</div>
+                </div>
             </div>
             <div class="inventory-help">
-                <p>🖱️ ЛКМ - экипировать/снять предмет</p>
+                <p>🖱️ ЛКМ - экипировать предмет</p>
                 <p>🖱️ ПКМ - продать предмет</p>
+                <p>💰 Цена продажи: 100% стоимости</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно экипировки -->
+    <div id="equipmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>⚔️ Экипировка</h2>
+            <div class="equipment-section">
+                <h3>🎯 Текущая экипировка</h3>
+                <div class="equipment-slots-modal">
+                    <div class="equipment-slot" data-slot="weapon">
+                        <div class="slot-header">
+                            <span class="slot-icon">⚔️</span>
+                            <span class="slot-title">Оружие</span>
+                        </div>
+                        <div class="slot-content" id="weaponSlotModal">
+                            <div class="empty-slot">Пусто</div>
+                        </div>
+                        <div class="slot-stats" id="weaponStats"></div>
+                    </div>
+                    
+                    <div class="equipment-slot" data-slot="armor">
+                        <div class="slot-header">
+                            <span class="slot-icon">🛡️</span>
+                            <span class="slot-title">Броня</span>
+                        </div>
+                        <div class="slot-content" id="armorSlotModal">
+                            <div class="empty-slot">Пусто</div>
+                        </div>
+                        <div class="slot-stats" id="armorStats"></div>
+                    </div>
+                    
+                    <div class="equipment-slot" data-slot="accessory">
+                        <div class="slot-header">
+                            <span class="slot-icon">💍</span>
+                            <span class="slot-title">Аксессуар</span>
+                        </div>
+                        <div class="slot-content" id="accessorySlotModal">
+                            <div class="empty-slot">Пусто</div>
+                        </div>
+                        <div class="slot-stats" id="accessoryStats"></div>
+                    </div>
+                </div>
+                
+                <div class="equipment-bonuses">
+                    <h4>📊 Суммарные бонусы от экипировки</h4>
+                    <div class="bonus-stats" id="bonusStats">
+                        <div class="bonus-row">
+                            <span>⚔️ Бонус урона:</span>
+                            <span id="totalDamageBonus">0</span>
+                        </div>
+                        <div class="bonus-row">
+                            <span>🛡️ Бонус защиты:</span>
+                            <span id="totalDefenseBonus">0</span>
+                        </div>
+                        <div class="bonus-row">
+                            <span>❤️ Бонус здоровья:</span>
+                            <span id="totalHealthBonus">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="equipment-help">
+                <p>🖱️ Нажмите на предмет в инвентаре, чтобы экипировать</p>
+                <p>🔄 Предметы автоматически заменяются при экипировке нового</p>
             </div>
         </div>
     </div>
