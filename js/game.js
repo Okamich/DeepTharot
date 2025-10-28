@@ -566,7 +566,7 @@ class Game {
                 if (e.button === 0) { // Только левая кнопка мыши
                     this.player.toggleEquipment(item);
                     this.openInventory(); // Обновляем инвентарь
-                    this.openEquipment(); // Обновляем окно экипировки
+                    //this.openEquipment(); // Обновляем окно экипировки
                     this.updatePlayerInfo();
                     e.stopPropagation(); // Предотвращаем всплытие
                 }
@@ -578,7 +578,7 @@ class Game {
                 if (confirm(`Продать ${item.name} за ${item.value} золота?`)) {
                     this.player.sellItem(item);
                     this.openInventory(); // Обновляем инвентарь
-                    this.openEquipment(); // Обновляем окно экипировки
+                    //this.openEquipment(); // Обновляем окно экипировки
                     this.updatePlayerInfo();
                 }
                 e.stopPropagation(); // Предотвращаем всплытие
