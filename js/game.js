@@ -530,62 +530,66 @@ class Game {
 
     // ========== МОДАЛЬНЫЕ ОКНА ИНВЕНТАРЯ И ЭКИПИРОВКИ ==========
     openInventory() {
-        const modal = document.getElementById('inventoryModal');
-        const inventoryGrid = document.getElementById('inventoryGrid');
-        const emptyInventory = document.getElementById('emptyInventory');
+    const modal = document.getElementById('inventoryModal');
+    const inventoryGrid = document.getElementById('inventoryGrid');
+    const emptyInventory = document.getElementById('emptyInventory');
+    
+    inventoryGrid.innerHTML = '';
+    
+    if (this.player.inventory.length === 0) {
+        emptyInventory.style.display = 'block';
+        inventoryGrid.style.display = 'none';
+    } else {
+        emptyInventory.style.display = 'none';
+        inventoryGrid.style.display = 'grid';
         
-        inventoryGrid.innerHTML = '';
-        
-        if (this.player.inventory.length === 0) {
-            emptyInventory.style.display = 'block';
-            inventoryGrid.style.display = 'none';
-        } else {
-            emptyInventory.style.display = 'none';
-            inventoryGrid.style.display = 'grid';
+        this.player.inventory.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'inventory-item';
+            if (this.player.equipment[item.type] === item) {
+                itemElement.classList.add('equipped');
+            }
             
-            this.player.inventory.forEach((item, index) => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'inventory-item';
-                if (this.player.equipment[item.type] === item) {
-                    itemElement.classList.add('equipped');
+            itemElement.innerHTML = `
+                <div class="item-value">${item.value}💰</div>
+                <div class="item-type">${item.getTypeName()}</div>
+                <div class="item-name">${item.name}</div>
+                <div class="item-stats">
+                    ${item.damageBonus ? `⚔️ +${item.damageBonus} урона<br>` : ''}
+                    ${item.defenseBonus ? `🛡️ +${item.defenseBonus} защиты<br>` : ''}
+                    ${item.healthBonus ? `❤️ +${item.healthBonus} здоровья` : ''}
+                </div>
+            `;
+            
+            // Обработчик для левой кнопки мыши (экипировка)
+            itemElement.addEventListener('click', (e) => {
+                if (e.button === 0) { // Только левая кнопка мыши
+                    this.player.toggleEquipment(item);
+                    this.openInventory(); // Обновляем инвентарь
+                    this.openEquipment(); // Обновляем окно экипировки
+                    this.updatePlayerInfo();
+                    e.stopPropagation(); // Предотвращаем всплытие
                 }
-                
-                itemElement.innerHTML = `
-                    <div class="item-value">${item.value}💰</div>
-                    <div class="item-type">${item.getTypeName()}</div>
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-stats">
-                        ${item.damageBonus ? `⚔️ +${item.damageBonus} урона<br>` : ''}
-                        ${item.defenseBonus ? `🛡️ +${item.defenseBonus} защиты<br>` : ''}
-                        ${item.healthBonus ? `❤️ +${item.healthBonus} здоровья` : ''}
-                    </div>
-                `;
-                
-                itemElement.addEventListener('click', (e) => {
-                    if (e.button === 0) { // ЛКМ
-                        this.player.toggleEquipment(item);
-                        this.openInventory();
-                        this.openEquipment(); // Обновляем окно экипировки
-                        this.updatePlayerInfo();
-                    }
-                });
-                
-                itemElement.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    if (confirm(`Продать ${item.name} за ${item.value} золота?`)) {
-                        this.player.sellItem(item);
-                        this.openInventory();
-                        this.openEquipment(); // Обновляем окно экипировки
-                        this.updatePlayerInfo();
-                    }
-                });
-                
-                inventoryGrid.appendChild(itemElement);
             });
-        }
-        
-        modal.style.display = 'block';
+            
+            // Обработчик для правой кнопки мыши (продажа)
+            itemElement.addEventListener('contextmenu', (e) => {
+                e.preventDefault(); // Предотвращаем появление контекстного меню браузера
+                if (confirm(`Продать ${item.name} за ${item.value} золота?`)) {
+                    this.player.sellItem(item);
+                    this.openInventory(); // Обновляем инвентарь
+                    this.openEquipment(); // Обновляем окно экипировки
+                    this.updatePlayerInfo();
+                }
+                e.stopPropagation(); // Предотвращаем всплытие
+            });
+            
+            inventoryGrid.appendChild(itemElement);
+        });
     }
+    
+    modal.style.display = 'block';
+}
 
     openEquipment() {
         const modal = document.getElementById('equipmentModal');
