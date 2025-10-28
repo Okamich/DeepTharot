@@ -13,38 +13,38 @@
             <div class="panel-section">
                 <h3>Игрок</h3>
                 <div class="stat-row">
-                    <span>Уровень:</span>
-                    <span id="playerLevel">1</span>
+                    <span>🎯 Уровень:</span>
+                    <span id="playerLevel" class="stat-value">1</span>
                 </div>
                 <div class="stat-row">
-                    <span>Опыт:</span>
-                    <span id="playerExp">0/100</span>
+                    <span>⭐ Опыт:</span>
+                    <span id="playerExp" class="stat-value">0/100</span>
                 </div>
                 <div class="progress-bar">
                     <div id="expBar" class="progress-fill" style="width: 0%"></div>
                 </div>
                 <div class="stat-row">
-                    <span>Здоровье:</span>
-                    <span id="playerHealth">100/100</span>
+                    <span>❤️ Здоровье:</span>
+                    <span id="playerHealth" class="stat-value">100/100</span>
                 </div>
                 <div class="progress-bar health-bar">
                     <div id="healthBar" class="progress-fill health-fill" style="width: 100%"></div>
                 </div>
                 <div class="stat-row">
-                    <span>Урон:</span>
-                    <span id="playerDamage">10</span>
+                    <span>⚔️ Урон:</span>
+                    <span id="playerDamage" class="stat-value">10</span>
                 </div>
                 <div class="stat-row">
-                    <span>Защита:</span>
-                    <span id="playerDefense">5</span>
+                    <span>🛡️ Защита:</span>
+                    <span id="playerDefense" class="stat-value">5</span>
                 </div>
                 <div class="stat-row">
-                    <span>Скорость:</span>
-                    <span id="playerSpeed">10</span>
+                    <span>⚡ Скорость:</span>
+                    <span id="playerSpeed" class="stat-value">10</span>
                 </div>
                 <div class="stat-row">
-                    <span>Золото:</span>
-                    <span id="playerGold">0</span>
+                    <span>💰 Золото:</span>
+                    <span id="playerGold" class="stat-value">0</span>
                 </div>
             </div>
 
@@ -52,15 +52,15 @@
                 <h3>Экипировка</h3>
                 <div class="equipment-slots">
                     <div class="slot" data-slot="weapon">
-                        <span>Оружие</span>
+                        <span>⚔️ Оружие</span>
                         <div id="weaponSlot" class="slot-content">Пусто</div>
                     </div>
                     <div class="slot" data-slot="armor">
-                        <span>Броня</span>
+                        <span>🛡️ Броня</span>
                         <div id="armorSlot" class="slot-content">Пусто</div>
                     </div>
                     <div class="slot" data-slot="accessory">
-                        <span>Аксессуар</span>
+                        <span>💍 Аксессуар</span>
                         <div id="accessorySlot" class="slot-content">Пусто</div>
                     </div>
                 </div>
@@ -69,15 +69,15 @@
             <div class="panel-section">
                 <h3>Прогресс</h3>
                 <div class="stat-row">
-                    <span>Уровень:</span>
+                    <span>🎯 Уровень:</span>
                     <span id="currentLevel">1</span>
                 </div>
                 <div class="stat-row">
-                    <span>Зона:</span>
+                    <span>🗺️ Зона:</span>
                     <span id="currentZone">1</span>
                 </div>
                 <div class="stat-row">
-                    <span>Исследование:</span>
+                    <span>🔍 Исследование:</span>
                     <span id="explorationProgress">0%</span>
                 </div>
                 <div class="progress-bar exploration-bar">
@@ -87,15 +87,15 @@
 
             <div class="panel-section">
                 <h3>Управление</h3>
-                <button id="inventoryBtn">Инвентарь (I)</button>
-                <button id="pauseBtn">Пауза</button>
+                <button id="inventoryBtn">📦 Инвентарь (I)</button>
+                <button id="pauseBtn">⏸️ Пауза</button>
             </div>
         </div>
 
         <!-- Основная игровая область -->
         <div class="game-area">
-            <div class="auto-battle-indicator" id="autoBattleIndicator" style="display: none;">АВТОБОЙ</div>
-            <div class="mode-indicator" id="modeIndicator">ИССЛЕДОВАНИЕ</div>
+            <div class="auto-battle-indicator" id="autoBattleIndicator" style="display: none;">⚔️ АВТОБОЙ</div>
+            <div class="mode-indicator" id="modeIndicator">🔍 ИССЛЕДОВАНИЕ</div>
             
             <div class="activity-log" id="activityLog">
                 <div class="log-entry log-info">Добро пожаловать в Idle RPG! Вы начинаете исследовать мир...</div>
@@ -146,10 +146,10 @@
 
                     <div class="combatants">
                         <div class="character">
-                            <div class="character-avatar" id="playerAvatar">P</div>
+                            <div class="character-avatar" id="playerAvatar">⚔️</div>
                             <div class="character-name" id="playerName">Игрок</div>
                             <div class="character-stats">
-                                HP: <span id="playerCurrentHealth">100</span>/<span id="playerMaxHealth">100</span>
+                                ❤️ HP: <span id="playerCurrentHealth">100</span>/<span id="playerMaxHealth">100</span>
                             </div>
                         </div>
 
@@ -166,13 +166,13 @@
     <div id="inventoryModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Инвентарь</h2>
+            <h2>🎒 Инвентарь</h2>
             <div class="inventory-grid" id="inventoryGrid">
                 <!-- Предметы будут добавляться здесь -->
             </div>
             <div class="inventory-help">
-                <p>ЛКМ - экипировать/снять предмет</p>
-                <p>ПКМ - продать предмет</p>
+                <p>🖱️ ЛКМ - экипировать/снять предмет</p>
+                <p>🖱️ ПКМ - продать предмет</p>
             </div>
         </div>
     </div>
